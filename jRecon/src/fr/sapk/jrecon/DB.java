@@ -28,15 +28,15 @@ import java.sql.Statement;
 public class DB {
 
     //private String DBPath = "data/db.sqlite";
-    private String DBPath = ":memory:";
+    private static String DBPath = ":memory:";
     
-    private Connection connection = null;
-    private Statement statement = null;
+    private static Connection connection = null;
+    private static Statement statement = null;
 
     public DB() {
         connect();
         check();
-        close();
+        //close();
     }
 
     void connect() {

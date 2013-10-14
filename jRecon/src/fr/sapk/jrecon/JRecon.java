@@ -17,11 +17,14 @@
 
 package fr.sapk.jrecon;
 
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
 /**
  *
  * @author Antoine
  */
-public class JRecon {
+public class JRecon{
 
     /**
      * @param args the command line arguments
@@ -30,7 +33,16 @@ public class JRecon {
         // TODO code application logic here
         System.out.println("Starting jRecon ...");
         DB db = new DB();
-        UI.init();
+        //new Thread(new UI()).start();
+        try { 
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
+            //TODO implement linux and fallback
+        } catch (Exception ex) { 
+            ex.printStackTrace(); 
+        }
+        UI ui = new UI();
+        SwingUtilities.invokeLater(ui);
+        
         System.out.println("Ready !");
     }
 

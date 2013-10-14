@@ -16,13 +16,50 @@
  */
 package fr.sapk.jrecon;
 
+import java.awt.FlowLayout;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 /**
  *
  * @author Antoine
  */
-public class UI {
+public class UI implements Runnable {
     
-    static void init() {
+    void UI(){    
+        System.out.println("Init UI");
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    @Override
+    public void run() {
         System.out.println("Starting UI ...");
-    };
+        
+        UIFrameHome f = new UIFrameHome();
+        f.setVisible(true);
+        /*
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        JFrame f = new JFrame("Hello, World!");
+        // Sets the behavior for when the window is closed
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // Add a layout manager so that the button is not placed on top of the label
+        f.setLayout(new FlowLayout());
+        // Add a label and a button
+        f.add(new JLabel("Hello, world!"));
+        f.add(new JButton("Press me!"));
+        // Arrange the components inside the window
+        f.pack();
+        // By default, the window is not visible. Make it visible.
+        f.setVisible(true);
+        */
+    }
 }
