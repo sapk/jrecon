@@ -16,15 +16,6 @@
  */
 package fr.sapk.jrecon;
 
-import java.awt.FlowLayout;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
 /**
  *
  * @author Antoine
@@ -33,11 +24,6 @@ public class UI implements Runnable {
     
     void UI(){    
         System.out.println("Init UI");
-        try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
     
     @Override
