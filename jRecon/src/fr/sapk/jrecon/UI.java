@@ -14,21 +14,15 @@
  You should have received a copy of the GNU General Public License
  along with jRecon.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package jrecon;
+package fr.sapk.jrecon;
 
 /**
  *
  * @author Antoine
  */
-public class JRecon {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-        System.out.println("Ready !");
-    }
-
+public class UI {
+    
+    static void init() {
+        System.out.println("Starting UI ...");
+    };
 }
