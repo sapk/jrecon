@@ -108,7 +108,7 @@ public class Analyse extends Thread {
         byte[] data = host.getBytes();
         try {
             socket = new DatagramSocket();
-            socket.setSoTimeout(2000);
+            socket.setSoTimeout(5000);
             socket.setTrafficClass(0x04 | 0x10);
             socket.connect(new InetSocketAddress(host, port));
             socket.send(new DatagramPacket(data, data.length));
@@ -150,7 +150,7 @@ public class Analyse extends Thread {
         try {
             //(Socket ignored = new Socket(ip, port))
             Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(ip, port), 2000);
+            socket.connect(new InetSocketAddress(ip, port), 3000);
             return true;
         } catch (IOException ignored) {
             return false;
@@ -162,6 +162,8 @@ public class Analyse extends Thread {
     }
 
     private void recon() {
+        //TODO multi-thread discovery
+        //TODO save to DB
         try {
             //TODO
             ResultSet current = DB.query("SELECT * FROM host WHERE id_analyse=" + id + " AND at='" + timestamp + "' ");
