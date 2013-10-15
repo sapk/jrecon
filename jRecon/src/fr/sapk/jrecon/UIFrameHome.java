@@ -17,6 +17,7 @@
 package fr.sapk.jrecon;
 
 import java.net.URL;
+import java.sql.Timestamp;
 import javax.swing.ImageIcon;
 
 /**
@@ -35,8 +36,10 @@ public class UIFrameHome extends javax.swing.JFrame {
         //setName("jRecon");
         setTitle("jRecon");
     }
-    
-        /** Returns an ImageIcon, or null if the path was invalid. */
+
+    /**
+     * Returns an ImageIcon, or null if the path was invalid.
+     */
     private static ImageIcon loadImageIcon(String path) {
         URL imgURL = UIFrameHome.class.getResource(path);
         if (imgURL != null) {
@@ -58,133 +61,314 @@ public class UIFrameHome extends javax.swing.JFrame {
 
         jTabbedPane = new javax.swing.JTabbedPane();
         jPanelAnalyse = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
+        ButtonGO = new javax.swing.JButton();
+        InputTarget = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jTextField2 = new javax.swing.JTextField();
+        CheckBoxPort = new javax.swing.JCheckBox();
+        InputPort = new javax.swing.JTextField();
+        CheckBoxLimit = new javax.swing.JCheckBox();
+        InputLimit = new javax.swing.JTextField();
+        CheckBoxDNS = new javax.swing.JCheckBox();
+        InputName = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        TextAreaEstimation = new javax.swing.JTextArea();
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTabbedPane.setAlignmentX(0.0F);
         jTabbedPane.setAlignmentY(0.0F);
+        jTabbedPane.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTabbedPane.setMinimumSize(new java.awt.Dimension(506, 200));
+        jTabbedPane.setPreferredSize(new java.awt.Dimension(506, 300));
 
-        jButton2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jButton2.setText("GO !");
-        jButton2.setToolTipText("");
-
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        ButtonGO.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        ButtonGO.setText("GO !");
+        ButtonGO.setToolTipText("");
+        ButtonGO.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                ButtonGOActionPerformed(evt);
+            }
+        });
+
+        InputTarget.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        InputTarget.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                InputTargetKeyReleased(evt);
             }
         });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel1.setText("IP Range \\ Hostname :");
 
-        jCheckBox1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jCheckBox1.setText("Port scan");
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+        CheckBoxPort.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        CheckBoxPort.setText("Port scan");
+        CheckBoxPort.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
+                CheckBoxPortActionPerformed(evt);
             }
         });
 
-        jTextField2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        InputPort.setEditable(false);
+        InputPort.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        InputPort.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                InputPortKeyReleased(evt);
+            }
+        });
+
+        CheckBoxLimit.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        CheckBoxLimit.setText("Limitation");
+        CheckBoxLimit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CheckBoxLimitActionPerformed(evt);
+            }
+        });
+
+        InputLimit.setEditable(false);
+        InputLimit.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        InputLimit.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                InputLimitKeyReleased(evt);
+            }
+        });
+
+        CheckBoxDNS.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        CheckBoxDNS.setText("DNS Resolution");
+
+        InputName.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        InputName.setToolTipText("Nom de l'analyse");
+
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(null, "Estimation", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("5x5 Pixel", 0, 14)))); // NOI18N
+
+        TextAreaEstimation.setBackground(new java.awt.Color(240, 240, 240));
+        TextAreaEstimation.setColumns(20);
+        TextAreaEstimation.setFont(new java.awt.Font("Miriam Fixed", 0, 12)); // NOI18N
+        TextAreaEstimation.setRows(5);
+        TextAreaEstimation.setText("Config. invalid");
+        jScrollPane2.setViewportView(TextAreaEstimation);
 
         javax.swing.GroupLayout jPanelAnalyseLayout = new javax.swing.GroupLayout(jPanelAnalyse);
         jPanelAnalyse.setLayout(jPanelAnalyseLayout);
         jPanelAnalyseLayout.setHorizontalGroup(
             jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelAnalyseLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAnalyseLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAnalyseLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAnalyseLayout.createSequentialGroup()
+                .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(InputName)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelAnalyseLayout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(InputTarget))
+                    .addGroup(jPanelAnalyseLayout.createSequentialGroup()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelAnalyseLayout.createSequentialGroup()
-                                .addGap(0, 76, Short.MAX_VALUE)
-                                .addComponent(jCheckBox1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jTextField1))))
-                .addContainerGap())
+                                .addComponent(CheckBoxDNS)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAnalyseLayout.createSequentialGroup()
+                                .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(CheckBoxPort)
+                                    .addComponent(CheckBoxLimit))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(InputPort, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                                    .addComponent(InputLimit)))
+                            .addComponent(ButtonGO, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(10, 10, 10))
         );
         jPanelAnalyseLayout.setVerticalGroup(
             jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelAnalyseLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(16, 16, 16)
+                .addComponent(InputName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(jLabel1)
+                    .addComponent(InputTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jCheckBox1)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanelAnalyseLayout.createSequentialGroup()
+                        .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(CheckBoxPort)
+                            .addComponent(InputPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanelAnalyseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(CheckBoxLimit)
+                            .addComponent(InputLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(CheckBoxDNS)
+                        .addGap(18, 18, 18)
+                        .addComponent(ButtonGO, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2))
+                .addGap(10, 10, 10))
         );
 
         jTabbedPane.addTab("Analyse", jPanelAnalyse);
+
+        jPanel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 501, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 247, Short.MAX_VALUE)
+        );
+
+        jTabbedPane.addTab("Results", jPanel1);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 501, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 247, Short.MAX_VALUE)
+        );
+
+        jTabbedPane.addTab("Logs", jPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    private void CheckBoxPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxPortActionPerformed
+        if (CheckBoxPort.isSelected()) {
+            InputPort.setEditable(true);
+        } else {
+            InputPort.setEditable(false);
+        }
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        Estimate();
+    }//GEN-LAST:event_CheckBoxPortActionPerformed
+
+    private void CheckBoxLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxLimitActionPerformed
+        if (CheckBoxLimit.isSelected()) {
+            InputLimit.setEditable(true);
+        } else {
+            InputLimit.setEditable(false);
+        }
+
+        Estimate();
+    }//GEN-LAST:event_CheckBoxLimitActionPerformed
+
+    private void ButtonGOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonGOActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
+    }//GEN-LAST:event_ButtonGOActionPerformed
+
+    private void InputTargetKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_InputTargetKeyReleased
+        Estimate();
+    }//GEN-LAST:event_InputTargetKeyReleased
+
+    private void InputPortKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_InputPortKeyReleased
+        Estimate();
+    }//GEN-LAST:event_InputPortKeyReleased
+
+    private void InputLimitKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_InputLimitKeyReleased
+        Estimate();
+    }//GEN-LAST:event_InputLimitKeyReleased
+
+    private void Estimate() {
+        //TODO check validity
+
+        System.out.println(InputName.getText());
+        System.out.println(InputLimit.getText());
+        System.out.println(InputPort.getText());
+        System.out.println(InputTarget.getText());
+        System.out.println(Tool.is_ip(InputTarget.getText().split("/")[0]));
+        System.out.println(Tool.is_network(InputTarget.getText()));
+        //TODO support hostname
+        /*
+         System.out.println(Integer.parseInt(InputTarget.getText().split("/")[1]));
+         System.out.println(32 - Integer.parseInt(InputTarget.getText().split("/")[1]));
+         System.out.println(Math.pow(2,32 - Integer.parseInt(InputTarget.getText().split("/")[1])));
+         */
+        if (Tool.is_network(InputTarget.getText())) {
+            double requests = 0;
+            requests += Math.pow(2, 32 - Integer.parseInt(InputTarget.getText().split("/")[1])) - 2;
+            requests = (requests <= 0) ? 1 : requests;
+
+            String time = String.format("%dh%02dm%02ds", (int) requests / 3600, ((int) requests % 3600) / 60, ((int) requests % 60));
+
+            System.out.println(requests);
+            TextAreaEstimation.setText("\n\n"
+                    + "Number of request : " + Compact(requests) + "Req\n"
+                    + "\n"
+                    + "Space required    : " + Compact(requests * 12) + "B\n"
+                    + "\n"
+                    + "Estimated time : " + time);
+        } else {
+            TextAreaEstimation.setText("\n\n"
+                    + "Config. invalid");
+        }
+    }
+
+    private String Compact(double n) {
+        char c = ' ';
+        if (n > 10000) {
+            n = n / 1000;
+            c = 'K';
+        }
+        if (n > 10000) {
+            n = n / 1000;
+            c = 'M';
+        }
+        if (n > 10000) {
+            n = n / 1000;
+            c = 'G';
+        }
+        return (int) n + " " + c;
+    }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        
+
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         /*
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(UIFrameHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(UIFrameHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(UIFrameHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(UIFrameHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        */
+         try {
+         for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+         if ("Nimbus".equals(info.getName())) {
+         javax.swing.UIManager.setLookAndFeel(info.getClassName());
+         break;
+         }
+         }
+         } catch (ClassNotFoundException ex) {
+         java.util.logging.Logger.getLogger(UIFrameHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         } catch (InstantiationException ex) {
+         java.util.logging.Logger.getLogger(UIFrameHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         } catch (IllegalAccessException ex) {
+         java.util.logging.Logger.getLogger(UIFrameHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+         java.util.logging.Logger.getLogger(UIFrameHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+         }
+         */
         //</editor-fold>
-        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -194,13 +378,21 @@ public class UIFrameHome extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JButton ButtonGO;
+    private javax.swing.JCheckBox CheckBoxDNS;
+    private javax.swing.JCheckBox CheckBoxLimit;
+    private javax.swing.JCheckBox CheckBoxPort;
+    private javax.swing.JTextField InputLimit;
+    private javax.swing.JTextField InputName;
+    private javax.swing.JTextField InputPort;
+    private javax.swing.JTextField InputTarget;
+    private javax.swing.JTextArea TextAreaEstimation;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanelAnalyse;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 
 }
