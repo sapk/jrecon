@@ -18,6 +18,7 @@ package fr.sapk.jrecon;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -27,19 +28,27 @@ import java.sql.Statement;
  */
 public class DB {
 
-    //private String DBPath = "data/db.sqlite";
-    private static String DBPath = ":memory:";
+    private String DBPath = "data/db.sqlite";
+    //private static String DBPath = ":memory:";
     
     private static Connection connection = null;
     private static Statement statement = null;
 
     public DB() {
-        connect();
-        check();
+        if(connection == null || statement == null){
+            connect();
+            check();
+        }
         //close();
     }
 
-    void connect() {
+    static ResultSet query(String sql) throws SQLException {
+        return statement.executeQuery(sql);
+    }
+    static void exec(String sql) throws SQLException {
+        statement.executeUpdate(sql);
+    }
+    private void connect() {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + DBPath);
@@ -54,7 +63,7 @@ public class DB {
         }
     }
 
-    void close() {
+    private void close() {
         try {
             connection.close();
             statement.close();
@@ -63,12 +72,13 @@ public class DB {
         }
     }
 
-    void check() {
+    private void check() {
         System.out.println("Checking DB ...");
 
         try {
-            statement.executeUpdate("CREATE TABLE host ('ip' TEXT, 'hostname' TEXT, 'ports' TEXT, 'at' INTEGER)");
-            statement.executeUpdate("CREATE TABLE route ('uuid' TEXT, 'from' TEXT, 'to' TEXT, 'at' INTEGER)");
+            statement.executeUpdate("CREATE TABLE analyse ('id_analyse' INTEGER PRIMARY KEY AUTOINCREMENT, 'state' TEXT, 'name' TEXT, 'target' TEXT, 'port' TEXT, 'limit' TEXT, 'checkdns' INTEGER, 'timestamp' INTEGER)");
+            statement.executeUpdate("CREATE TABLE host ('id_analyse' INTEGER, 'ip' TEXT, 'hostname' TEXT, 'tcp' TEXT, 'udp' TEXT, 'at' INTEGER)");
+            statement.executeUpdate("CREATE TABLE route ('id_analyse' INTEGER, 'uuid' TEXT, 'from' TEXT, 'to' TEXT, 'at' INTEGER)");
         } catch (SQLException e) {
             e.printStackTrace();
         }

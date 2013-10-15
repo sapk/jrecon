@@ -17,7 +17,6 @@
 package fr.sapk.jrecon;
 
 import java.net.URL;
-import java.sql.Timestamp;
 import javax.swing.ImageIcon;
 
 /**
@@ -136,6 +135,11 @@ public class UIFrameHome extends javax.swing.JFrame {
 
         CheckBoxDNS.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         CheckBoxDNS.setText("DNS Resolution");
+        CheckBoxDNS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CheckBoxDNSActionPerformed(evt);
+            }
+        });
 
         InputName.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         InputName.setToolTipText("Nom de l'analyse");
@@ -288,29 +292,53 @@ public class UIFrameHome extends javax.swing.JFrame {
         Estimate();
     }//GEN-LAST:event_InputLimitKeyReleased
 
+    private void CheckBoxDNSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckBoxDNSActionPerformed
+        Estimate();
+    }//GEN-LAST:event_CheckBoxDNSActionPerformed
+
     private void Estimate() {
         //TODO check validity
-
+        /*
         System.out.println(InputName.getText());
         System.out.println(InputLimit.getText());
         System.out.println(InputPort.getText());
         System.out.println(InputTarget.getText());
-        System.out.println(Tool.is_ip(InputTarget.getText().split("/")[0]));
         System.out.println(Tool.is_network(InputTarget.getText()));
-        //TODO support hostname
+        System.out.println(Tool.is_hostname(InputTarget.getText()));
+        */
         /*
          System.out.println(Integer.parseInt(InputTarget.getText().split("/")[1]));
          System.out.println(32 - Integer.parseInt(InputTarget.getText().split("/")[1]));
          System.out.println(Math.pow(2,32 - Integer.parseInt(InputTarget.getText().split("/")[1])));
          */
-        if (Tool.is_network(InputTarget.getText())) {
+        if (Tool.is_network(InputTarget.getText()) || Tool.is_hostname(InputTarget.getText())) {
             double requests = 0;
-            requests += Math.pow(2, 32 - Integer.parseInt(InputTarget.getText().split("/")[1])) - 2;
+            if(Tool.is_network(InputTarget.getText()))
+                requests += Math.pow(2, 32 - Integer.parseInt(InputTarget.getText().split("/")[1])) - 2;
+            else
+                requests += 1;
+            
             requests = (requests <= 0) ? 1 : requests;
-
-            String time = String.format("%dh%02dm%02ds", (int) requests / 3600, ((int) requests % 3600) / 60, ((int) requests % 60));
-
-            System.out.println(requests);
+            double multi = 1;
+            if (CheckBoxPort.isSelected() && InputPort.getText().split("-").length == 2) {
+                //TODO check validity of range
+                multi = 1+(Integer.parseInt(InputPort.getText().split("-")[1]) - Integer.parseInt(InputPort.getText().split("-")[0])+1);
+            }
+            if (CheckBoxDNS.isSelected()) {
+                multi += 1;
+            }
+            //System.out.println(multi);
+            requests *= multi;
+            
+            if (CheckBoxLimit.isSelected() && InputLimit.getText().length() > 0 && Double.parseDouble(InputLimit.getText()) > 0) {
+                    multi = 1/(Double.parseDouble(InputLimit.getText()));
+                    //TODO implement multitreading request
+            }else{
+                    multi = 2; 
+            }
+            
+            String time = String.format("%dh%02dm%02ds", (int)(requests*multi) / 3600, ((int)(requests*multi) % 3600) / 60, ((int)(requests*multi) % 60));
+            //System.out.println(requests);
             TextAreaEstimation.setText("\n\n"
                     + "Number of request : " + Compact(requests) + "Req\n"
                     + "\n"
@@ -378,7 +406,7 @@ public class UIFrameHome extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ButtonGO;
+    public javax.swing.JButton ButtonGO;
     private javax.swing.JCheckBox CheckBoxDNS;
     private javax.swing.JCheckBox CheckBoxLimit;
     private javax.swing.JCheckBox CheckBoxPort;
@@ -394,5 +422,30 @@ public class UIFrameHome extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane;
     // End of variables declaration//GEN-END:variables
+
+    void disableAll() {
+        ButtonGO.setEnabled(false);
+        CheckBoxDNS.setEnabled(false);
+        CheckBoxLimit.setEnabled(false);
+        CheckBoxPort.setEnabled(false);
+        InputLimit.setEnabled(false);
+        InputName.setEnabled(false);
+        InputPort.setEnabled(false);
+        InputTarget.setEnabled(false);
+        TextAreaEstimation.setEnabled(false);
+    }
+
+    boolean config_is_valid() {
+        return !TextAreaEstimation.getText().contains("Config. invalid");
+    }
+
+    String[] get_config() {
+        return new String[] {
+            InputName.getText(),
+            InputTarget.getText(),
+            ((CheckBoxPort.isSelected())?InputPort.getText():null),
+            ((CheckBoxLimit.isSelected())?InputLimit.getText():null),
+            ((CheckBoxDNS.isSelected())?"true":"false")
+        };    }
 
 }

@@ -21,31 +21,33 @@ package fr.sapk.jrecon;
  * @author Antoine
  */
 public class UI implements Runnable {
-    
-    void UI(){    
+
+    static Analyse p;
+            
+    void UI() {
         System.out.println("Init UI");
     }
-    
+
     @Override
     public void run() {
         System.out.println("Starting UI ...");
-        
-        UIFrameHome f = new UIFrameHome();
+
+        final UIFrameHome f = new UIFrameHome();
         f.setVisible(true);
-        /*
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        JFrame f = new JFrame("Hello, World!");
-        // Sets the behavior for when the window is closed
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // Add a layout manager so that the button is not placed on top of the label
-        f.setLayout(new FlowLayout());
-        // Add a label and a button
-        f.add(new JLabel("Hello, world!"));
-        f.add(new JButton("Press me!"));
-        // Arrange the components inside the window
-        f.pack();
-        // By default, the window is not visible. Make it visible.
-        f.setVisible(true);
-        */
+        f.ButtonGO.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (f.ButtonGO.getText().contains("Pause")){
+                    //TODO implement pause and resume (wait and notify)
+                }else if (f.config_is_valid()) {
+                    f.disableAll();
+                    p = new Analyse(f.get_config());
+                    p.setPriority(Thread.MIN_PRIORITY);
+                    p.start();
+                    
+                    f.ButtonGO.setEnabled(true);
+                    f.ButtonGO.setText("Pause");
+                }
+            }
+        });
     }
 }

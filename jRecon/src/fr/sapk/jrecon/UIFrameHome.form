@@ -147,6 +147,9 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonGOActionPerformed"/>
               </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JTextField" name="InputTarget">
               <Properties>
@@ -217,6 +220,9 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="DNS Resolution"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="CheckBoxDNSActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="InputName">
               <Properties>

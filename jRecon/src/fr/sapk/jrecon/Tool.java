@@ -16,10 +16,6 @@
  */
 package fr.sapk.jrecon;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -39,7 +35,6 @@ public class Tool {
             return false;
     } 
     public static boolean is_hostname(String s){
-      
-        return false;
+          return s.matches("^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$");
     } 
 }
