@@ -18,6 +18,24 @@ package fr.sapk.jrecon;
 
 import java.net.URL;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import prefuse.*;
+import prefuse.action.ActionList;
+import prefuse.action.RepaintAction;
+import prefuse.action.assignment.ColorAction;
+import prefuse.action.assignment.DataColorAction;
+import prefuse.action.layout.graph.ForceDirectedLayout;
+import prefuse.activity.Activity;
+import prefuse.controls.DragControl;
+import prefuse.controls.PanControl;
+import prefuse.controls.ZoomControl;
+import prefuse.data.Graph;
+import prefuse.data.io.DataIOException;
+import prefuse.data.io.GraphMLReader;
+import prefuse.render.DefaultRendererFactory;
+import prefuse.render.LabelRenderer;
+import prefuse.util.ColorLib;
+import prefuse.visual.VisualItem;
 
 /**
  *
@@ -72,7 +90,9 @@ public class UIFrameHome extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         TextAreaEstimation = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
+        ButtonTest = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
+        bProgressBar = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -127,6 +147,12 @@ public class UIFrameHome extends javax.swing.JFrame {
 
         InputLimit.setEditable(false);
         InputLimit.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        InputLimit.setText("10");
+        InputLimit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                InputLimitActionPerformed(evt);
+            }
+        });
         InputLimit.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 InputLimitKeyReleased(evt);
@@ -151,6 +177,8 @@ public class UIFrameHome extends javax.swing.JFrame {
         TextAreaEstimation.setFont(new java.awt.Font("Miriam Fixed", 0, 12)); // NOI18N
         TextAreaEstimation.setRows(5);
         TextAreaEstimation.setText("Config. invalid");
+        TextAreaEstimation.setAutoscrolls(false);
+        TextAreaEstimation.setFocusable(false);
         jScrollPane2.setViewportView(TextAreaEstimation);
 
         javax.swing.GroupLayout jPanelAnalyseLayout = new javax.swing.GroupLayout(jPanelAnalyse);
@@ -214,15 +242,28 @@ public class UIFrameHome extends javax.swing.JFrame {
 
         jPanel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
 
+        ButtonTest.setText("Test");
+        ButtonTest.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ButtonTestActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 501, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(384, Short.MAX_VALUE)
+                .addComponent(ButtonTest)
+                .addGap(64, 64, 64))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 247, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(49, 49, 49)
+                .addComponent(ButtonTest)
+                .addContainerGap(175, Short.MAX_VALUE))
         );
 
         jTabbedPane.addTab("Results", jPanel1);
@@ -244,13 +285,17 @@ public class UIFrameHome extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(bProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -296,16 +341,88 @@ public class UIFrameHome extends javax.swing.JFrame {
         Estimate();
     }//GEN-LAST:event_CheckBoxDNSActionPerformed
 
+    private void InputLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InputLimitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_InputLimitActionPerformed
+
+    private void ButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonTestActionPerformed
+        // TODO add your handling code here:
+        System.out.println("Test starting ...");
+        Graph graph = null;
+        try {
+            graph = new GraphMLReader().readGraph("data/socialnet.xml");
+        } catch (DataIOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading graph. Exiting...");
+            System.exit(1);
+        }
+        Visualization vis = new Visualization();
+        vis.add("graph", graph);
+
+        LabelRenderer r = new LabelRenderer("name");
+        r.setRoundedCorner(8, 8);
+
+        vis.setRendererFactory(new DefaultRendererFactory(r));
+// create our nominal color palette
+// pink for females, baby blue for males
+        int[] palette = new int[]{
+            ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255)
+        };
+// map nominal data values to colors using our provided palette
+        DataColorAction fill = new DataColorAction("graph.nodes", "gender",
+                Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+// use black for node text
+        ColorAction text = new ColorAction("graph.nodes",
+                VisualItem.TEXTCOLOR, ColorLib.gray(0));
+// use light grey for edges
+        ColorAction edges = new ColorAction("graph.edges",
+                VisualItem.STROKECOLOR, ColorLib.gray(200));
+
+// create an action list containing all color assignments
+        ActionList color = new ActionList();
+        color.add(fill);
+        color.add(text);
+        color.add(edges);
+
+        // create an action list with an animated layout
+// the INFINITY parameter tells the action list to run indefinitely
+        ActionList layout = new ActionList(Activity.INFINITY);
+        layout.add(new ForceDirectedLayout("graph"));
+        layout.add(new RepaintAction());
+        // add the actions to the visualization
+        vis.putAction("color", color);
+        vis.putAction("layout", layout);
+
+        // create a new Display that pull from our Visualization
+        Display display = new Display(vis);
+        display.setSize(720, 500); // set display size
+        display.addControlListener(new DragControl()); // drag items around
+        display.addControlListener(new PanControl());  // pan with background left-drag
+        display.addControlListener(new ZoomControl()); // zoom with vertical right-drag
+
+        // create a new window to hold the visualization
+        JFrame frame = new JFrame("Map");
+// ensure application exits when window is closed
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(display);
+        frame.pack();           // layout components in window
+        frame.setVisible(true); // show the window
+
+        vis.run("color");  // assign the colors
+        vis.run("layout"); // start up the animated layout
+        System.out.println("Test ended");
+    }//GEN-LAST:event_ButtonTestActionPerformed
+
     private void Estimate() {
         //TODO check validity
         /*
-        System.out.println(InputName.getText());
-        System.out.println(InputLimit.getText());
-        System.out.println(InputPort.getText());
-        System.out.println(InputTarget.getText());
-        System.out.println(Tool.is_network(InputTarget.getText()));
-        System.out.println(Tool.is_hostname(InputTarget.getText()));
-        */
+         System.out.println(InputName.getText());
+         System.out.println(InputLimit.getText());
+         System.out.println(InputPort.getText());
+         System.out.println(InputTarget.getText());
+         System.out.println(Tool.is_network(InputTarget.getText()));
+         System.out.println(Tool.is_hostname(InputTarget.getText()));
+         */
         /*
          System.out.println(Integer.parseInt(InputTarget.getText().split("/")[1]));
          System.out.println(32 - Integer.parseInt(InputTarget.getText().split("/")[1]));
@@ -313,31 +430,34 @@ public class UIFrameHome extends javax.swing.JFrame {
          */
         if (Tool.is_network(InputTarget.getText()) || Tool.is_hostname(InputTarget.getText())) {
             double requests = 0;
-            if(Tool.is_network(InputTarget.getText()))
+            if (Tool.is_network(InputTarget.getText())) {
                 requests += Math.pow(2, 32 - Integer.parseInt(InputTarget.getText().split("/")[1])) - 2;
-            else
+            } else {
                 requests += 1;
-            
+            }
+
             requests = (requests <= 0) ? 1 : requests;
-            double multi = 1;
+            double multi = 0;
             if (CheckBoxPort.isSelected() && InputPort.getText().split("-").length == 2) {
                 //TODO check validity of range
-                multi = 1+(Integer.parseInt(InputPort.getText().split("-")[1]) - Integer.parseInt(InputPort.getText().split("-")[0])+1);
+                multi += (Integer.parseInt(InputPort.getText().split("-")[1]) - Integer.parseInt(InputPort.getText().split("-")[0]) + 1);
             }
             if (CheckBoxDNS.isSelected()) {
                 multi += 1;
             }
+
             //System.out.println(multi);
-            requests *= multi;
-            
+            //request étati multiplié par 10 pour les traceroute (moyenne)
+            requests = 10 * requests + (requests) * multi;
+
             if (CheckBoxLimit.isSelected() && InputLimit.getText().length() > 0 && Double.parseDouble(InputLimit.getText()) > 0) {
-                    multi = 1/(Double.parseDouble(InputLimit.getText()));
-                    //TODO implement multitreading request
-            }else{
-                    multi = 2; 
+                multi = 1 / (Double.parseDouble(InputLimit.getText()));
+                //TODO implement multitreading request
+            } else {
+                multi = 0.1;
             }
-            
-            String time = String.format("%dh%02dm%02ds", (int)(requests*multi) / 3600, ((int)(requests*multi) % 3600) / 60, ((int)(requests*multi) % 60));
+
+            String time = String.format("%dh%02dm%02ds", (int) (requests * multi) / 3600, ((int) (requests * multi) % 3600) / 60, ((int) (requests * multi) % 60));
             //System.out.println(requests);
             TextAreaEstimation.setText("\n\n"
                     + "Number of request : " + Compact(requests) + "Req\n"
@@ -407,6 +527,7 @@ public class UIFrameHome extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton ButtonGO;
+    private javax.swing.JButton ButtonTest;
     private javax.swing.JCheckBox CheckBoxDNS;
     private javax.swing.JCheckBox CheckBoxLimit;
     private javax.swing.JCheckBox CheckBoxPort;
@@ -415,6 +536,7 @@ public class UIFrameHome extends javax.swing.JFrame {
     private javax.swing.JTextField InputPort;
     private javax.swing.JTextField InputTarget;
     private javax.swing.JTextArea TextAreaEstimation;
+    public javax.swing.JProgressBar bProgressBar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -424,28 +546,41 @@ public class UIFrameHome extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     void disableAll() {
-        ButtonGO.setEnabled(false);
-        CheckBoxDNS.setEnabled(false);
-        CheckBoxLimit.setEnabled(false);
-        CheckBoxPort.setEnabled(false);
-        InputLimit.setEnabled(false);
-        InputName.setEnabled(false);
-        InputPort.setEnabled(false);
-        InputTarget.setEnabled(false);
-        TextAreaEstimation.setEnabled(false);
+        setAll(false);
+    }
+
+    void enableAll() {
+        setAll(true);
+    }
+
+    void setAll(boolean state) {
+        ButtonGO.setEnabled(state);
+        CheckBoxDNS.setEnabled(state);
+        CheckBoxLimit.setEnabled(state);
+        CheckBoxPort.setEnabled(state);
+        InputLimit.setEnabled(state);
+        InputName.setEnabled(state);
+        InputPort.setEnabled(state);
+        InputTarget.setEnabled(state);
+        TextAreaEstimation.setEnabled(state);
     }
 
     boolean config_is_valid() {
+        if (InputPort.getText().matches("^[0-9]+$")) {
+            InputPort.setText(InputPort.getText() + "-" + InputPort.getText());
+        }
+        Estimate();
         return !TextAreaEstimation.getText().contains("Config. invalid");
     }
 
     String[] get_config() {
-        return new String[] {
+        return new String[]{
             InputName.getText(),
-            InputTarget.getText(),
-            ((CheckBoxPort.isSelected())?InputPort.getText():null),
-            ((CheckBoxLimit.isSelected())?InputLimit.getText():null),
-            ((CheckBoxDNS.isSelected())?"true":"false")
-        };    }
+            InputTarget.getText().toLowerCase(),
+            ((CheckBoxPort.isSelected()) ? InputPort.getText() : null),
+            ((CheckBoxLimit.isSelected()) ? InputLimit.getText() : "10"),
+            ((CheckBoxDNS.isSelected()) ? "true" : "false")
+        };
+    }
 
 }

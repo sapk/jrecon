@@ -78,7 +78,7 @@ public class DB {
         try {
             statement.executeUpdate("CREATE TABLE analyse ('id_analyse' INTEGER PRIMARY KEY AUTOINCREMENT, 'state' TEXT, 'name' TEXT, 'target' TEXT, 'port' TEXT, 'limit' TEXT, 'checkdns' INTEGER, 'timestamp' INTEGER)");
             statement.executeUpdate("CREATE TABLE host ('id_analyse' INTEGER, 'ip' TEXT, 'hostname' TEXT, 'tcp' TEXT, 'udp' TEXT, 'at' INTEGER)");
-            statement.executeUpdate("CREATE TABLE route ('id_analyse' INTEGER, 'uuid' TEXT, 'from' TEXT, 'to' TEXT, 'at' INTEGER)");
+            statement.executeUpdate("CREATE TABLE route ('id_analyse' INTEGER, 'uuid' TEXT, 'hop' INTEGER, 'from' TEXT, 'to' TEXT, 'at' INTEGER)");
         } catch (SQLException e) {
             e.printStackTrace();
         }

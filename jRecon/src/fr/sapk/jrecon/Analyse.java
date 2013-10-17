@@ -76,7 +76,7 @@ public class Analyse extends Thread {
         request_total = (request_total <= 0) ? 1 : request_total;
 
         if (port != null && port.split("-").length == 2) {
-            request_total *= 1 + (Integer.parseInt(port.split("-")[1]) - Integer.parseInt(port.split("-")[0]) + 1);
+            request_total = request_total*10 + request_total*(Integer.parseInt(port.split("-")[1]) - Integer.parseInt(port.split("-")[0]) + 1);
         }
 
         try {
@@ -231,7 +231,7 @@ public class Analyse extends Thread {
                 String ip = current.getString("ip");
 
                 parse_traceroute(traceroute(ip), ip);
-                request_done++;
+                request_done+=10;
 
                 if (port != null && port.split("-").length == 2) {
                     for (int i = Integer.parseInt(port.split("-")[0]); i <= Integer.parseInt(port.split("-")[1]); i++) {
