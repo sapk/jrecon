@@ -74,9 +74,10 @@ public class Analyse extends Thread {
         }
 
         request_total = (request_total <= 0) ? 1 : request_total;
-
+        
+        request_total *= 10;
         if (port != null && port.split("-").length == 2) {
-            request_total = request_total*10 + request_total*(Integer.parseInt(port.split("-")[1]) - Integer.parseInt(port.split("-")[0]) + 1);
+            request_total += request_total * (Integer.parseInt(port.split("-")[1]) - Integer.parseInt(port.split("-")[0]) + 1);
         }
 
         try {
@@ -107,18 +108,18 @@ public class Analyse extends Thread {
             //TODO populate db with all ip possible.
             String ip = target.split("/")[0];
             String masque = target.split("/")[1];
-            System.out.println(ip + " " + masque );
-            double num_masque = Math.pow(2, 32-Integer.parseInt(masque))-1;
+            System.out.println(ip + " " + masque);
+            double num_masque = Math.pow(2, 32 - Integer.parseInt(masque)) - 1;
             double num_ip_host = Tool.IPtoDouble(ip);
-            double num_ip_reseau = num_ip_host - (num_ip_host%num_masque);
+            double num_ip_reseau = num_ip_host - (num_ip_host % num_masque);
             double num_ip_broadcast = num_ip_reseau + num_masque;
-            System.out.println(num_masque + " " + num_ip_host + " " + num_ip_reseau + " " + num_ip_broadcast );
+            System.out.println(num_masque + " " + num_ip_host + " " + num_ip_reseau + " " + num_ip_broadcast);
             /*
-            byte[4] masque = 
-            byte[4] ip_host;
-            byte[4] ip_reseau;
-            byte[4] ip_broadcast;
-            */
+             byte[4] masque = 
+             byte[4] ip_host;
+             byte[4] ip_reseau;
+             byte[4] ip_broadcast;
+             */
         } else if (Tool.is_hostname(target)) {
             try {
                 //TODO support multiple ip DNS.
@@ -147,10 +148,15 @@ public class Analyse extends Thread {
         String previous_ip = ip;
         String host_ip = null;
         for (String line : tracert.split("\n")) {
-            if (line.startsWith("  " + i) || line.startsWith(" " + i)) {
+            if (( line.startsWith("  " + i) || line.startsWith(" " + i)  ) && !line.endsWith("!X")) {
                 //System.out.println(line.lastIndexOf("  "));
                 //System.out.println(line.split("  "));
-                String host = (line.split("  ")[line.split("  ").length - 1]).trim();
+                String host;
+                if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                    host = (line.split("  ")[line.split("  ").length - 1]).trim();
+                } else {
+                    host = (line.split("  ")[1]).trim();
+                }
                 //System.out.println(host);
                 if (Tool.is_ip(host)) {
                     System.out.println("ip :" + host);
@@ -184,11 +190,13 @@ public class Analyse extends Thread {
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
                 //TODO optimize cmd and support or not DNS and change timeout to params
                 System.out.println("tracert -4 -w 100 " + ((checkdns == "false") ? "-d" : "") + " " + ip);
+                //route += "win\n";
                 traceRt = Runtime.getRuntime().exec("tracert -w 100 " + ((checkdns == "false") ? "-d" : "") + " " + ip);
             } else {
                 //TODO optimize cmd and support or not DNS
-                System.out.println("traceroute " + ip);
-                traceRt = Runtime.getRuntime().exec("traceroute " + ip);
+                System.out.println("traceroute -w 100 " + ((checkdns == "false") ? "-n" : "") + " " + ip);
+                //route += "unix\n";
+                traceRt = Runtime.getRuntime().exec("traceroute -w 100 " + ((checkdns == "false") ? "-n" : "") + " " + ip);
             }
             BufferedReader buff = new BufferedReader(new InputStreamReader(traceRt.getInputStream()));
 
@@ -231,7 +239,7 @@ public class Analyse extends Thread {
                 String ip = current.getString("ip");
 
                 parse_traceroute(traceroute(ip), ip);
-                request_done+=10;
+                request_done += 10;
 
                 if (port != null && port.split("-").length == 2) {
                     for (int i = Integer.parseInt(port.split("-")[0]); i <= Integer.parseInt(port.split("-")[1]); i++) {
@@ -244,7 +252,7 @@ public class Analyse extends Thread {
                         Scan s = new Scan(ip, i);
                         s.start();
                         process.add(s);
-                        
+
                         if (process.size() > 0) {
                             Scan scan = process.get(0);
                             if (!scan.isAlive()) {

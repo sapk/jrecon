@@ -58,13 +58,13 @@ public class Tool {
         ip = ip.trim();
         System.out.println(ip);
         System.out.println(ip.split(".")[0]);
-        double n = Double.parseDouble(ip.split(".")[0])*256*256*256;
+        double n = Integer.parseInt(ip.split(".")[0])*256*256*256;
         System.out.println(n);
-        n += Double.parseDouble(ip.split(".")[1])*256*256;
+        n += Integer.parseInt(ip.split(".")[1])*256*256;
         System.out.println(n);
-        n += Double.parseDouble(ip.split(".")[2])*256;
+        n += Integer.parseInt(ip.split(".")[2])*256;
         System.out.println(n);
-        n += Double.parseDouble(ip.split(".")[3]);
+        n += Integer.parseInt(ip.split(".")[3]);
         System.out.println(n);
         return n;
     }

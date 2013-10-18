@@ -14,7 +14,6 @@
  You should have received a copy of the GNU General Public License
  along with jRecon.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package fr.sapk.jrecon;
 
 import javax.swing.SwingUtilities;
@@ -24,7 +23,7 @@ import javax.swing.UIManager;
  *
  * @author Antoine
  */
-public class JRecon{
+public class JRecon {
 
     /**
      * @param args the command line arguments
@@ -34,15 +33,18 @@ public class JRecon{
         System.out.println("Starting jRecon ...");
         DB db = new DB();
         //new Thread(new UI()).start();
-        try { 
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
-            //TODO implement linux and fallback
-        } catch (Exception ex) { 
-            ex.printStackTrace(); 
+        try {
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
+            // Set System L&F
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         UI ui = new UI();
         SwingUtilities.invokeLater(ui);
-        
+
         System.out.println("Ready !");
     }
 

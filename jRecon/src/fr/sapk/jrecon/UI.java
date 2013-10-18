@@ -75,14 +75,14 @@ public class UI extends Thread {
                     f.bProgressBar.setString(p.request_done + " / " + p.request_total);
                 } else {
                     f.bProgressBar.setString(p.state);
-                    
-                    if (p.request_done >= p.request_total) {
-                        p = null;
-                        f.enableAll();
+                }
+                if ((p.request_done >= p.request_total ) || p.state == "Finished !" || !p.isAlive()) {
+                    f.bProgressBar.setString("Finished !");
+                    p = null;
+                    f.enableAll();
 
-                        f.ButtonGO.setText("GO !");
-                        break;
-                    }
+                    f.ButtonGO.setText("GO !");
+                    break;
                 }
 
                 f.bProgressBar.setValue((int) p.request_done);
