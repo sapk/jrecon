@@ -14,6 +14,10 @@
  You should have received a copy of the GNU General Public License
  along with jRecon.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+//TODO add option to not traceroute.
+//TODO add options to scan only pingable destination
+
 package fr.sapk.jrecon;
 
 import java.net.URL;
@@ -432,7 +436,8 @@ public class UIFrameHome extends javax.swing.JFrame {
         if (Tool.is_network(InputTarget.getText()) || Tool.is_hostname(InputTarget.getText())) {
             double requests = 0;
             if (Tool.is_network(InputTarget.getText())) {
-                requests += Math.pow(2, 32 - Integer.parseInt(InputTarget.getText().split("/")[1])) - 2;
+                //On compte les ip réseau et broadcast au cas d'une séparation simple des recherches.
+                requests += Math.pow(2, 32 - Integer.parseInt(InputTarget.getText().split("/")[1]));
             } else {
                 requests += 1;
             }

@@ -16,6 +16,9 @@
  */
 package fr.sapk.jrecon;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  *
  * @author Antoine
@@ -54,18 +57,29 @@ public class Tool {
             (byte) ((l >> 0) & 0xff),};
     }
 
-    public static double IPtoDouble(String ip) {
+    public static long IPtoLong(String ip) {
+        //TODO suport IPv6
         ip = ip.trim();
         System.out.println(ip);
-        System.out.println(ip.split(".")[0]);
-        double n = Integer.parseInt(ip.split(".")[0])*256*256*256;
-        System.out.println(n);
-        n += Integer.parseInt(ip.split(".")[1])*256*256;
-        System.out.println(n);
-        n += Integer.parseInt(ip.split(".")[2])*256;
-        System.out.println(n);
-        n += Integer.parseInt(ip.split(".")[3]);
-        System.out.println(n);
+        long n = (long) Integer.parseInt(ip.split("\\.")[0]) * 256 * 256 * 256;
+        n += (long) Integer.parseInt(ip.split("\\.")[1]) * 256 * 256;
+        n += (long) Integer.parseInt(ip.split("\\.")[2]) * 256;
+        n += (long) Integer.parseInt(ip.split("\\.")[3]);
         return n;
+    }
+
+    public static String LongtoIPv4(long n) {
+        long d = (n % 256);
+        long c = (n / 256) % 256;
+        long b = (n / (256 * 256)) % 256;
+        long a = (n / (256 * 256 * 256)) % 256;
+
+        return a + "." + b + "." + c + "." + d;
+    }
+
+    public static String reverseDns(String hostIp) throws UnknownHostException{
+        //TODO optimize for ip without reverseDNS.
+        InetAddress addr = InetAddress.getByName(hostIp);
+        return addr.getHostName();
     }
 }
