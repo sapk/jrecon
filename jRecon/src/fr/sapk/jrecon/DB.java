@@ -38,7 +38,7 @@ public class DB {
         check();
     }
 
-    private String DBPath = "data/db.sqlite";
+    private static String DBPath = "data/db.sqlite";
     //private static String DBPath = ":memory:";
 
     private static Connection connection = null;
@@ -53,14 +53,20 @@ public class DB {
     }
 
     static ResultSet query(String sql) throws SQLException {
+        if (connection == null || statement == null || connection.isClosed()) {
+            connect();
+        }
         return statement.executeQuery(sql);
     }
 
     static void exec(String sql) throws SQLException {
+        if (connection == null || statement == null) {
+            connect();
+        }
         statement.executeUpdate(sql);
     }
 
-    private void connect() {
+    private static void connect() {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + DBPath);

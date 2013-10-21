@@ -21,7 +21,9 @@ package fr.sapk.jrecon;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -527,8 +529,9 @@ public class UIFrameHome extends javax.swing.JFrame {
             String selected = ComboBoxResult.getSelectedItem().toString();
             //TODO
             ResultSet analyse = DB.query("SELECT * FROM analyse WHERE id_analyse=" + selected.split("\\)")[0]);
+            String id = analyse.getString("id_analyse");
             //query.
-            File file = new File("data/export.sql");
+            File file = new File("data/export/export-"+ URLEncoder.encode( analyse.getString("name").split("#")[0] ) +"-"+analyse.getString("timestamp")+".sql");
             if (file.exists()) {
                 file.delete();
             }
@@ -537,14 +540,16 @@ public class UIFrameHome extends javax.swing.JFrame {
             FileWriter writer = new FileWriter(file);
             writer.write("/* export : " + analyse.getString("id_analyse") + " */" + "\n" + "\n" + "\n");
 
-            ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse=" + analyse.getString("id_analyse"));
+            writer.write("INSERT INTO analyse  ('id_analyse', 'state', 'name', 'target', 'port', 'limit', 'checkdns', 'timestamp', 'ended_at') VALUES ('$$ID_ANALYSE$$', 'Imported', '" + analyse.getString("name") + "', '" + analyse.getString("target") + "', '" + analyse.getString("port") + "', '" + analyse.getString("limit") + "', '" + analyse.getString("checkdns") + "', '" + analyse.getString("timestamp") + ", '" + analyse.getString("ended_at") + "'') " + "\n");
+
+            ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse=" + id);
             while (host.next()) {
 //"INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + hostname + "', '[]', '[]', '" + timestamp + "') "
                 writer.write("INSERT INTO host  ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES ('$$ID_ANALYSE$$', '" + host.getString("ip") + "', '" + host.getString("hostname") + "', '" + host.getString("tcp") + "', '" + host.getString("udp") + "', '" + host.getString("at") + "') " + "\n");
-
-            writer.write( "\n" + "\n");
             }
-            ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse=" + analyse.getString("id_analyse"));
+            writer.write("\n" + "\n");
+            //host.close();
+            ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse=" + id);
             while (route.next()) {
 //"INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + hostname + "', '[]', '[]', '" + timestamp + "') "
                 writer.write("INSERT INTO route  ('id_analyse', 'uuid', 'hop', 'from', 'to', 'at') VALUES ('$$ID_ANALYSE$$', '" + route.getString("uuid") + "', '" + route.getString("hop") + "', '" + route.getString("from") + "', '" + route.getString("to") + "', '" + route.getString("at") + "') " + "\n");
