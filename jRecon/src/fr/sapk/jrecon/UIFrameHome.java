@@ -479,9 +479,10 @@ public class UIFrameHome extends javax.swing.JFrame {
              ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255)
              };
              // map nominal data values to colors using our provided palette
-             DataColorAction fill = new DataColorAction("graph.nodes", "gender",
-             Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+             //DataColorAction fill = new DataColorAction("graph.nodes", "gender",
+             //Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
              // use black for node text
+             ColorAction fill = new ColorAction("graph.nodes", VisualItem.FILLCOLOR,ColorLib.rgb(160, 240, 160));
              ColorAction text = new ColorAction("graph.nodes",
              VisualItem.TEXTCOLOR, ColorLib.gray(0));
              // use light grey for edges
@@ -512,6 +513,7 @@ public class UIFrameHome extends javax.swing.JFrame {
             
              // create a new window to hold the visualization
              JFrame frame = new JFrame("Map");
+             frame.setIconImage(loadImageIcon("/img/icon.png").getImage());
              // ensure application exits when window is closed
              // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
              frame.add(display);
@@ -800,6 +802,7 @@ public class UIFrameHome extends javax.swing.JFrame {
 
         ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
         List<String> nodes = new ArrayList<String>();
+        List<String> trajets = new ArrayList<String>();
         while (route.next()) {
             int source = 0;
             int target = 0;
@@ -825,7 +828,10 @@ public class UIFrameHome extends javax.swing.JFrame {
                 target = nodes.indexOf(route.getString("to"))+1;
             }
 
-            writer.write("\n<edge source=\""+source+"\" target=\""+target+"\"></edge>\n");
+            if (!trajets.contains(source+"->"+target)) {
+                trajets.add(source+"->"+target);
+                writer.write("\n<edge source=\""+source+"\" target=\""+target+"\"></edge>\n");
+            }
         }
 
         writer.write("\n\n"

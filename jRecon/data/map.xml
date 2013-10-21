@@ -8,23 +8,30 @@
 
 
 <node id="1">
- <data key="ip">148.60.83.161</data>
+ <data key="ip">192.168.0.172</data>
  </node>
 <node id="2">
- <data key="ip">148.60.87.252</data>
+ <data key="ip">null</data>
  </node>
 
 <edge source="1" target="2"></edge>
 <node id="3">
- <data key="ip">148.60.248.254</data>
+ <data key="ip">192.168.0.1</data>
  </node>
 
-<edge source="2" target="3"></edge>
+<edge source="1" target="3"></edge>
 <node id="4">
- <data key="ip">37.187.4.165</data>
+ <data key="ip">192.168.0.129</data>
  </node>
 
-<edge source="3" target="4"></edge>
+<edge source="1" target="4"></edge>
+
+<edge source="1" target="1"></edge>
+<node id="5">
+ <data key="ip">192.168.0.184</data>
+ </node>
+
+<edge source="1" target="5"></edge>
 
 
 </graph>
