@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -129,7 +130,7 @@ public class Analyse extends Thread {
 
             for (long i = num_ip_reseau; i <= num_ip_broadcast; i++) {
                 String ip = Tool.LongtoIPv4(i);
-             //   System.out.println(ip);
+                //   System.out.println(ip);
                 String hostname = ip;
                 if (checkdns == "true") {
                     try {
@@ -171,10 +172,19 @@ public class Analyse extends Thread {
 
         System.out.println("Parsing traceroute ... : #" + tracert.hashCode());
         int i = 1;
-        String previous_ip = ip;
+        String previous_ip = null;
+        //TODO detect ip of output
+        Socket s;
+        try {
+            s = new Socket("free.fr", 80);
+            previous_ip = s.getLocalAddress().getHostAddress();
+            s.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+        }
         String host_ip = null;
         for (String line : tracert.split("\n")) {
-            if ((line.startsWith("  " + i) || line.startsWith(" " + i)) && !line.endsWith("!X")) {
+            if ((line.startsWith("  " + i) || line.startsWith(" " + i) || line.startsWith("" + i)) && !line.endsWith("!X")) {
                 //System.out.println(line.lastIndexOf("  "));
                 //System.out.println(line.split("  "));
                 String host;
@@ -185,11 +195,11 @@ public class Analyse extends Thread {
                 }
                 //System.out.println(host);
                 if (Tool.is_ip(host)) {
-                    System.out.println("ip :" + host);
+                    System.out.println("ip :" + previous_ip + ">" + host);
                     host_ip = host;
                 } else if (Tool.is_hostname(host.split(" ")[0])) {
                     host_ip = host.split(" ")[1].substring(1, host.split(" ")[1].length() - 2);
-                    System.out.println("hostname :" + host);
+                    System.out.println("hostname :" + previous_ip + ">" + host);
                 }
 
                 if (host_ip != previous_ip) {
@@ -226,7 +236,7 @@ public class Analyse extends Thread {
 
             String line;
             while ((line = buff.readLine()) != null) {
-                System.out.println(line);
+                //System.out.println(line);
                 route += line + "\n";
             }
             //route= ((ByteArrayInputStream) traceRt.getInputStream()).toString();
@@ -262,7 +272,7 @@ public class Analyse extends Thread {
             System.out.println(ips);
             //while (current.next()) {
             for (final String ip : ips) {
-                
+
                 //TODO ??? support recup last port range
                 //System.out.println(current.getString("tcp").substring(1, -1));
                 //List<Integer> tcp = new ArrayList<Integer>(Arrays.asList(current.getString("tcp").substring(1, -1).split(",")));
@@ -276,7 +286,8 @@ public class Analyse extends Thread {
                         parse_traceroute(traceroute(ip), ip);
                     }
                 });
-                        
+
+                trcrt_thread.start();
 
                 if (port != null && port.split("-").length == 2) {
                     List<Integer> tcp = new ArrayList<Integer>();
@@ -339,7 +350,7 @@ public class Analyse extends Thread {
 
                     DB.exec("UPDATE host SET udp='" + udp + "', tcp='" + tcp + "' WHERE id_analyse=" + id + " AND ip='" + ip + "' ");
                 }
-                while(trcrt_thread.isAlive()){
+                while (trcrt_thread.isAlive()) {
                     try {
                         // ON reprend la limite pour reveerfier la fin du traceroute car cela doit bien correspondre aux ressources sur la machine.
                         sleep(1000 / Integer.parseInt(limit));
@@ -347,9 +358,9 @@ public class Analyse extends Thread {
                         Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
+
                 request_done += 10;
-                        
+
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
