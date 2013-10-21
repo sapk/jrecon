@@ -444,78 +444,91 @@ public class UIFrameHome extends javax.swing.JFrame {
     }//GEN-LAST:event_InputLimitActionPerformed
 
     private void ButtonShowGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonShowGraphActionPerformed
-        // TODO add your handling code here:
-        new Thread(new Runnable() {
 
-            @Override
-            public void run() {
+        String selected = ComboBoxResult.getSelectedItem().toString();
+        //TODO
+        try {
+            buildXMLMap(selected.split("\\)")[0]);
 
-                System.out.println("Test starting ...");
-                Graph graph = null;
-                try {
-                    graph = new GraphMLReader().readGraph("data/socialnet.xml");
-                } catch (DataIOException e) {
-                    e.printStackTrace();
-                    System.err.println("Error loading graph. Exiting...");
-                    System.exit(1);
-                }
-                Visualization vis = new Visualization();
-                vis.add("graph", graph);
-
-                LabelRenderer r = new LabelRenderer("name");
-                r.setRoundedCorner(8, 8);
-
-                vis.setRendererFactory(new DefaultRendererFactory(r));
-// create our nominal color palette
-// pink for females, baby blue for males
-                int[] palette = new int[]{
-                    ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255)
-                };
-// map nominal data values to colors using our provided palette
-                DataColorAction fill = new DataColorAction("graph.nodes", "gender",
-                        Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-// use black for node text
-                ColorAction text = new ColorAction("graph.nodes",
-                        VisualItem.TEXTCOLOR, ColorLib.gray(0));
-// use light grey for edges
-                ColorAction edges = new ColorAction("graph.edges",
-                        VisualItem.STROKECOLOR, ColorLib.gray(200));
-
-// create an action list containing all color assignments
-                ActionList color = new ActionList();
-                color.add(fill);
-                color.add(text);
-                color.add(edges);
-
-                // create an action list with an animated layout
-// the INFINITY parameter tells the action list to run indefinitely
-                ActionList layout = new ActionList(Activity.INFINITY);
-                layout.add(new ForceDirectedLayout("graph"));
-                layout.add(new RepaintAction());
-                // add the actions to the visualization
-                vis.putAction("color", color);
-                vis.putAction("layout", layout);
-
-                // create a new Display that pull from our Visualization
-                Display display = new Display(vis);
-                display.setSize(720, 500); // set display size
-                display.addControlListener(new DragControl()); // drag items around
-                display.addControlListener(new PanControl());  // pan with background left-drag
-                display.addControlListener(new ZoomControl()); // zoom with vertical right-drag
-
-                // create a new window to hold the visualization
-                JFrame frame = new JFrame("Map");
-// ensure application exits when window is closed
-                // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.add(display);
-                frame.pack();           // layout components in window
-                frame.setVisible(true); // show the window
-
-                vis.run("color");  // assign the colors
-                vis.run("layout"); // start up the animated layout
-                System.out.println("Test ended");
-            }
-        }).start();
+// TODO add your handling code here:
+            
+             new Thread(new Runnable() {
+            
+             @Override
+             public void run() {
+            
+             System.out.println("Test starting ...");
+             Graph graph = null;
+             try {
+             graph = new GraphMLReader().readGraph("data/map.xml");
+             } catch (DataIOException e) {
+             e.printStackTrace();
+             System.err.println("Error loading graph. Exiting...");
+             System.exit(1);
+             }
+             Visualization vis = new Visualization();
+             vis.add("graph", graph);
+            
+             LabelRenderer r = new LabelRenderer("ip");
+             r.setRoundedCorner(8, 8);
+            
+             vis.setRendererFactory(new DefaultRendererFactory(r));
+             // create our nominal color palette
+             // pink for females, baby blue for males
+             int[] palette = new int[]{
+             ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255)
+             };
+             // map nominal data values to colors using our provided palette
+             DataColorAction fill = new DataColorAction("graph.nodes", "gender",
+             Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+             // use black for node text
+             ColorAction text = new ColorAction("graph.nodes",
+             VisualItem.TEXTCOLOR, ColorLib.gray(0));
+             // use light grey for edges
+             ColorAction edges = new ColorAction("graph.edges",
+             VisualItem.STROKECOLOR, ColorLib.gray(200));
+            
+             // create an action list containing all color assignments
+             ActionList color = new ActionList();
+             color.add(fill);
+             color.add(text);
+             color.add(edges);
+            
+             // create an action list with an animated layout
+             // the INFINITY parameter tells the action list to run indefinitely
+             ActionList layout = new ActionList(Activity.INFINITY);
+             layout.add(new ForceDirectedLayout("graph"));
+             layout.add(new RepaintAction());
+             // add the actions to the visualization
+             vis.putAction("color", color);
+             vis.putAction("layout", layout);
+            
+             // create a new Display that pull from our Visualization
+             Display display = new Display(vis);
+             display.setSize(720, 500); // set display size
+             display.addControlListener(new DragControl()); // drag items around
+             display.addControlListener(new PanControl());  // pan with background left-drag
+             display.addControlListener(new ZoomControl()); // zoom with vertical right-drag
+            
+             // create a new window to hold the visualization
+             JFrame frame = new JFrame("Map");
+             // ensure application exits when window is closed
+             // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+             frame.add(display);
+             frame.pack();           // layout components in window
+             frame.setVisible(true); // show the window
+            
+             vis.run("color");  // assign the colors
+             vis.run("layout"); // start up the animated layout
+             System.out.println("Test ended");
+             }
+             }).start();
+             
+        } catch (IOException ex) {
+            Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_ButtonShowGraphActionPerformed
 
     private void ButtonResetDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonResetDBActionPerformed
@@ -531,7 +544,7 @@ public class UIFrameHome extends javax.swing.JFrame {
             ResultSet analyse = DB.query("SELECT * FROM analyse WHERE id_analyse=" + selected.split("\\)")[0]);
             String id = analyse.getString("id_analyse");
             //query.
-            File file = new File("data/export/export-"+ URLEncoder.encode( analyse.getString("name").split("#")[0] ) +"-"+analyse.getString("timestamp")+".sql");
+            File file = new File("data/export/export-" + URLEncoder.encode(analyse.getString("name").split("#")[0]) + "-" + analyse.getString("timestamp") + ".sql");
             if (file.exists()) {
                 file.delete();
             }
@@ -764,6 +777,61 @@ public class UIFrameHome extends javax.swing.JFrame {
 
     void enableAll() {
         setAll(true);
+    }
+
+    void buildXMLMap(String id_analyse) throws IOException, SQLException {
+        File file = new File("data/map.xml");
+        if (file.exists()) {
+            file.delete();
+        }
+        file.createNewFile();
+
+        FileWriter writer = new FileWriter(file);
+
+        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<!--  An excerpt of an egocentric social network  -->\n"
+                + "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\">\n"
+                + "<graph edgedefault=\"undirected\">\n"
+                + " \n"
+                + "<!-- data schema -->\n"
+                + "<key id=\"ip\" for=\"node\" attr.name=\"ip\" attr.type=\"string\"/>\n"
+                //     + "<key id=\"hostname\" for=\"node\" attr.name=\"hostname\" attr.type=\"string\"/>\n"
+                + "\n\n");
+
+        ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
+        List<String> nodes = new ArrayList<String>();
+        while (route.next()) {
+            int source = 0;
+            int target = 0;
+            if (!nodes.contains(route.getString("from"))) {
+                nodes.add(route.getString("from"));
+                writer.write("<node id=\"" + nodes.size() + "\">\n"
+                        + " <data key=\"ip\">" + route.getString("from") + "</data>\n"
+                        //  + " <data key=\"hostname\">M</data>\n"
+                        + " </node>\n");
+                source = nodes.size();
+            } else {
+                source = nodes.indexOf(route.getString("from"))+1;
+            }
+            
+            if (!nodes.contains(route.getString("to"))) {
+                nodes.add(route.getString("to"));
+                writer.write("<node id=\"" + nodes.size() + "\">\n"
+                        + " <data key=\"ip\">" + route.getString("to") + "</data>\n"
+                        //  + " <data key=\"hostname\">M</data>\n"
+                        + " </node>\n");
+                target = nodes.size();
+            } else {
+                target = nodes.indexOf(route.getString("to"))+1;
+            }
+
+            writer.write("\n<edge source=\""+source+"\" target=\""+target+"\"></edge>\n");
+        }
+
+        writer.write("\n\n"
+                + "</graph>\n"
+                + "</graphml>");
+        writer.flush();
     }
 
     void setAll(boolean state) {
