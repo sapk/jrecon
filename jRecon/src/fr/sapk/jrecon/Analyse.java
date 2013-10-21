@@ -95,7 +95,7 @@ public class Analyse extends Thread {
          }
          */
         try {
-            DB.exec("INSERT INTO analyse ('state', 'name', 'target', 'port' , 'limit', 'checkdns', 'timestamp') VALUES ('Running', '" + name + "', '" + target + "', '" + port + "', '" + limit + "', '" + checkdns + "', '" + timestamp + "') ");
+            DB.exec("INSERT INTO analyse ('state', 'name', 'target', 'port' , 'limit', 'checkdns', 'timestamp', ended_at) VALUES ('Running', '" + name + "', '" + target + "', '" + port + "', '" + limit + "', '" + checkdns + "', '" + timestamp + "', '" + timestamp + "') ");
             ResultSet ret = DB.query("SELECT * FROM analyse WHERE name='" + name + "' ");
             id = ret.getInt("id_analyse");
             System.out.println("id analyse : " + id);
@@ -115,6 +115,11 @@ public class Analyse extends Thread {
         state = "Running ...";
         recon();
         state = "Finished !";
+        try {
+            DB.exec("UPDATE analyse SET state='Finished', ended_at="+System.currentTimeMillis()+" WHERE id_analyse=" + id + " ");
+        } catch (SQLException ex) {
+            Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void populate_db() {

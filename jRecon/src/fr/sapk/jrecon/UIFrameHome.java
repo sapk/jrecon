@@ -14,13 +14,20 @@
  You should have received a copy of the GNU General Public License
  along with jRecon.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 //TODO add option to not traceroute.
 //TODO add options to scan only pingable destination
-
 package fr.sapk.jrecon;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import prefuse.*;
@@ -93,9 +100,16 @@ public class UIFrameHome extends javax.swing.JFrame {
         InputName = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         TextAreaEstimation = new javax.swing.JTextArea();
-        jPanel1 = new javax.swing.JPanel();
-        ButtonTest = new javax.swing.JButton();
+        PanelResults = new javax.swing.JPanel();
+        ButtonShowGraph = new javax.swing.JButton();
+        ButtonExport = new javax.swing.JButton();
+        ButtonSupprimer = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        InfoScanPanel = new javax.swing.JTextPane();
+        ComboBoxResult = new javax.swing.JComboBox();
         jPanel2 = new javax.swing.JPanel();
+        ButtonResetDB = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
         bProgressBar = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -247,46 +261,123 @@ public class UIFrameHome extends javax.swing.JFrame {
 
         jTabbedPane.addTab("Analyse", jPanelAnalyse);
 
-        jPanel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-
-        ButtonTest.setText("Test");
-        ButtonTest.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ButtonTestActionPerformed(evt);
+        PanelResults.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        PanelResults.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                PanelResultsComponentShown(evt);
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(436, Short.MAX_VALUE)
-                .addComponent(ButtonTest)
-                .addGap(64, 64, 64))
+        ButtonShowGraph.setText("Show Graph");
+        ButtonShowGraph.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ButtonShowGraphActionPerformed(evt);
+            }
+        });
+
+        ButtonExport.setText("Exporter");
+        ButtonExport.setToolTipText("");
+        ButtonExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ButtonExportActionPerformed(evt);
+            }
+        });
+
+        ButtonSupprimer.setText("Supprimer");
+        ButtonSupprimer.setToolTipText("");
+        ButtonSupprimer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ButtonSupprimerActionPerformed(evt);
+            }
+        });
+
+        InfoScanPanel.setEditable(false);
+        InfoScanPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Infos", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+        jScrollPane1.setViewportView(InfoScanPanel);
+
+        ComboBoxResult.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ComboBoxResult.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboBoxResultActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout PanelResultsLayout = new javax.swing.GroupLayout(PanelResults);
+        PanelResults.setLayout(PanelResultsLayout);
+        PanelResultsLayout.setHorizontalGroup(
+            PanelResultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelResultsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(PanelResultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ComboBoxResult, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(PanelResultsLayout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(PanelResultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(ButtonSupprimer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(ButtonShowGraph, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE)
+                            .addComponent(ButtonExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(49, 49, 49)
-                .addComponent(ButtonTest)
-                .addContainerGap(169, Short.MAX_VALUE))
+        PanelResultsLayout.setVerticalGroup(
+            PanelResultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(PanelResultsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(ComboBoxResult, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(PanelResultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelResultsLayout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(ButtonShowGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(ButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
+                        .addComponent(ButtonSupprimer, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 19, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
+                .addContainerGap())
         );
 
-        jTabbedPane.addTab("Results", jPanel1);
+        jTabbedPane.addTab("Results", PanelResults);
+
+        ButtonResetDB.setText("Reset DB");
+        ButtonResetDB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ButtonResetDBActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 528, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(286, Short.MAX_VALUE)
+                .addComponent(ButtonResetDB, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(ButtonResetDB, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(189, Short.MAX_VALUE))
+        );
+
+        jTabbedPane.addTab("Config", jPanel2);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 528, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 241, Short.MAX_VALUE)
         );
 
-        jTabbedPane.addTab("Logs", jPanel2);
+        jTabbedPane.addTab("Logs", jPanel3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -350,73 +441,177 @@ public class UIFrameHome extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_InputLimitActionPerformed
 
-    private void ButtonTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonTestActionPerformed
+    private void ButtonShowGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonShowGraphActionPerformed
         // TODO add your handling code here:
-        System.out.println("Test starting ...");
-        Graph graph = null;
-        try {
-            graph = new GraphMLReader().readGraph("data/socialnet.xml");
-        } catch (DataIOException e) {
-            e.printStackTrace();
-            System.err.println("Error loading graph. Exiting...");
-            System.exit(1);
-        }
-        Visualization vis = new Visualization();
-        vis.add("graph", graph);
+        new Thread(new Runnable() {
 
-        LabelRenderer r = new LabelRenderer("name");
-        r.setRoundedCorner(8, 8);
+            @Override
+            public void run() {
 
-        vis.setRendererFactory(new DefaultRendererFactory(r));
+                System.out.println("Test starting ...");
+                Graph graph = null;
+                try {
+                    graph = new GraphMLReader().readGraph("data/socialnet.xml");
+                } catch (DataIOException e) {
+                    e.printStackTrace();
+                    System.err.println("Error loading graph. Exiting...");
+                    System.exit(1);
+                }
+                Visualization vis = new Visualization();
+                vis.add("graph", graph);
+
+                LabelRenderer r = new LabelRenderer("name");
+                r.setRoundedCorner(8, 8);
+
+                vis.setRendererFactory(new DefaultRendererFactory(r));
 // create our nominal color palette
 // pink for females, baby blue for males
-        int[] palette = new int[]{
-            ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255)
-        };
+                int[] palette = new int[]{
+                    ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255)
+                };
 // map nominal data values to colors using our provided palette
-        DataColorAction fill = new DataColorAction("graph.nodes", "gender",
-                Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+                DataColorAction fill = new DataColorAction("graph.nodes", "gender",
+                        Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
 // use black for node text
-        ColorAction text = new ColorAction("graph.nodes",
-                VisualItem.TEXTCOLOR, ColorLib.gray(0));
+                ColorAction text = new ColorAction("graph.nodes",
+                        VisualItem.TEXTCOLOR, ColorLib.gray(0));
 // use light grey for edges
-        ColorAction edges = new ColorAction("graph.edges",
-                VisualItem.STROKECOLOR, ColorLib.gray(200));
+                ColorAction edges = new ColorAction("graph.edges",
+                        VisualItem.STROKECOLOR, ColorLib.gray(200));
 
 // create an action list containing all color assignments
-        ActionList color = new ActionList();
-        color.add(fill);
-        color.add(text);
-        color.add(edges);
+                ActionList color = new ActionList();
+                color.add(fill);
+                color.add(text);
+                color.add(edges);
 
-        // create an action list with an animated layout
+                // create an action list with an animated layout
 // the INFINITY parameter tells the action list to run indefinitely
-        ActionList layout = new ActionList(Activity.INFINITY);
-        layout.add(new ForceDirectedLayout("graph"));
-        layout.add(new RepaintAction());
-        // add the actions to the visualization
-        vis.putAction("color", color);
-        vis.putAction("layout", layout);
+                ActionList layout = new ActionList(Activity.INFINITY);
+                layout.add(new ForceDirectedLayout("graph"));
+                layout.add(new RepaintAction());
+                // add the actions to the visualization
+                vis.putAction("color", color);
+                vis.putAction("layout", layout);
 
-        // create a new Display that pull from our Visualization
-        Display display = new Display(vis);
-        display.setSize(720, 500); // set display size
-        display.addControlListener(new DragControl()); // drag items around
-        display.addControlListener(new PanControl());  // pan with background left-drag
-        display.addControlListener(new ZoomControl()); // zoom with vertical right-drag
+                // create a new Display that pull from our Visualization
+                Display display = new Display(vis);
+                display.setSize(720, 500); // set display size
+                display.addControlListener(new DragControl()); // drag items around
+                display.addControlListener(new PanControl());  // pan with background left-drag
+                display.addControlListener(new ZoomControl()); // zoom with vertical right-drag
 
-        // create a new window to hold the visualization
-        JFrame frame = new JFrame("Map");
+                // create a new window to hold the visualization
+                JFrame frame = new JFrame("Map");
 // ensure application exits when window is closed
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(display);
-        frame.pack();           // layout components in window
-        frame.setVisible(true); // show the window
+                // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.add(display);
+                frame.pack();           // layout components in window
+                frame.setVisible(true); // show the window
 
-        vis.run("color");  // assign the colors
-        vis.run("layout"); // start up the animated layout
-        System.out.println("Test ended");
-    }//GEN-LAST:event_ButtonTestActionPerformed
+                vis.run("color");  // assign the colors
+                vis.run("layout"); // start up the animated layout
+                System.out.println("Test ended");
+            }
+        }).start();
+    }//GEN-LAST:event_ButtonShowGraphActionPerformed
+
+    private void ButtonResetDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonResetDBActionPerformed
+        DB db = new DB();
+        db.reset();
+    }//GEN-LAST:event_ButtonResetDBActionPerformed
+
+    private void ButtonExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonExportActionPerformed
+        try {
+
+            String selected = ComboBoxResult.getSelectedItem().toString();
+            //TODO
+            ResultSet analyse = DB.query("SELECT * FROM analyse WHERE id_analyse=" + selected.split("\\)")[0]);
+            //query.
+            File file = new File("data/export.sql");
+            if (file.exists()) {
+                file.delete();
+            }
+            file.createNewFile();
+
+            FileWriter writer = new FileWriter(file);
+            writer.write("/* export : " + analyse.getString("id_analyse") + " */" + "\n" + "\n" + "\n");
+
+            ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse=" + analyse.getString("id_analyse"));
+            while (host.next()) {
+//"INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + hostname + "', '[]', '[]', '" + timestamp + "') "
+                writer.write("INSERT INTO host  ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES ('$$ID_ANALYSE$$', '" + host.getString("ip") + "', '" + host.getString("hostname") + "', '" + host.getString("tcp") + "', '" + host.getString("udp") + "', '" + host.getString("at") + "') " + "\n");
+
+            writer.write( "\n" + "\n");
+            }
+            ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse=" + analyse.getString("id_analyse"));
+            while (route.next()) {
+//"INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + hostname + "', '[]', '[]', '" + timestamp + "') "
+                writer.write("INSERT INTO route  ('id_analyse', 'uuid', 'hop', 'from', 'to', 'at') VALUES ('$$ID_ANALYSE$$', '" + route.getString("uuid") + "', '" + route.getString("hop") + "', '" + route.getString("from") + "', '" + route.getString("to") + "', '" + route.getString("at") + "') " + "\n");
+
+            }
+            writer.flush();
+            writer.close();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_ButtonExportActionPerformed
+
+    private void ButtonSupprimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonSupprimerActionPerformed
+
+        String selected = ComboBoxResult.getSelectedItem().toString();
+        try {
+            DB.exec("DELETE FROM route WHERE id_analyse=" + selected.split("\\)")[0]);
+            DB.exec("DELETE FROM host WHERE id_analyse=" + selected.split("\\)")[0]);
+            DB.exec("DELETE FROM analyse WHERE id_analyse=" + selected.split("\\)")[0]);
+            PanelResultsComponentShown(null);
+        } catch (SQLException ex) {
+            Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_ButtonSupprimerActionPerformed
+
+    private void PanelResultsComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_PanelResultsComponentShown
+        System.out.println("PanelResultsComponentShown()");
+        try {
+            ResultSet analyse = DB.query("SELECT * FROM analyse");
+            List<String> names = new ArrayList<String>();
+            while (analyse.next()) {
+                names.add(analyse.getString("id_analyse") + ") " + analyse.getString("name"));
+                //jComboBox1.add(analyse.getString("name"), null);
+                //
+                //jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+                //jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(es));
+            }
+            ComboBoxResult.setModel(new javax.swing.DefaultComboBoxModel(names.toArray()));
+        } catch (SQLException ex) {
+            Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ComboBoxResultActionPerformed(null);
+    }//GEN-LAST:event_PanelResultsComponentShown
+
+    private void ComboBoxResultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxResultActionPerformed
+        //System.out.println(evt.paramString());             
+        //TODO clean null detection (no error)
+        InfoScanPanel.setText("\n");
+        String selected = ComboBoxResult.getSelectedItem().toString();
+
+        try {
+            System.out.println("SELECT * FROM analyse WHERE id_analyse=" + selected.split("\\)")[0]);
+            ResultSet analyse = DB.query("SELECT * FROM analyse WHERE id_analyse=" + selected.split("\\)")[0]);
+            InfoScanPanel.setText("\n"
+                    + "State : " + analyse.getString("state") + "\n"
+                    + "Started at : " + analyse.getDate("timestamp").toLocaleString() + "\n"
+                    + "Ended at : " + analyse.getDate("ended_at").toLocaleString() + "\n"
+                    + "Target : " + analyse.getString("target") + "\n"
+                    + "Port : " + analyse.getString("port") + "\n"
+            );
+        } catch (SQLException ex) {
+            Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_ComboBoxResultActionPerformed
 
     private void Estimate() {
         //TODO check validity
@@ -532,21 +727,28 @@ public class UIFrameHome extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ButtonExport;
     public javax.swing.JButton ButtonGO;
-    private javax.swing.JButton ButtonTest;
+    private javax.swing.JButton ButtonResetDB;
+    private javax.swing.JButton ButtonShowGraph;
+    private javax.swing.JButton ButtonSupprimer;
     private javax.swing.JCheckBox CheckBoxDNS;
     private javax.swing.JCheckBox CheckBoxLimit;
     private javax.swing.JCheckBox CheckBoxPort;
+    private javax.swing.JComboBox ComboBoxResult;
+    private javax.swing.JTextPane InfoScanPanel;
     private javax.swing.JTextField InputLimit;
     private javax.swing.JTextField InputName;
     private javax.swing.JTextField InputPort;
     private javax.swing.JTextField InputTarget;
+    private javax.swing.JPanel PanelResults;
     private javax.swing.JTextArea TextAreaEstimation;
     public javax.swing.JProgressBar bProgressBar;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanelAnalyse;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane;
     // End of variables declaration//GEN-END:variables

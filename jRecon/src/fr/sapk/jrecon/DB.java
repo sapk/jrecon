@@ -16,6 +16,7 @@
  */
 package fr.sapk.jrecon;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -28,14 +29,23 @@ import java.sql.Statement;
  */
 public class DB {
 
+    // synchronized ????
+    void reset() {
+        close();
+        File f = new File(DBPath);
+        f.delete();
+        connect();
+        check();
+    }
+
     private String DBPath = "data/db.sqlite";
     //private static String DBPath = ":memory:";
-    
+
     private static Connection connection = null;
     private static Statement statement = null;
 
     public DB() {
-        if(connection == null || statement == null){
+        if (connection == null || statement == null) {
             connect();
             check();
         }
@@ -45,9 +55,11 @@ public class DB {
     static ResultSet query(String sql) throws SQLException {
         return statement.executeQuery(sql);
     }
+
     static void exec(String sql) throws SQLException {
         statement.executeUpdate(sql);
     }
+
     private void connect() {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -76,7 +88,7 @@ public class DB {
         System.out.println("Checking DB ...");
 
         try {
-            statement.executeUpdate("CREATE TABLE analyse ('id_analyse' INTEGER PRIMARY KEY AUTOINCREMENT, 'state' TEXT, 'name' TEXT, 'target' TEXT, 'port' TEXT, 'limit' TEXT, 'checkdns' INTEGER, 'timestamp' INTEGER)");
+            statement.executeUpdate("CREATE TABLE analyse ('id_analyse' INTEGER PRIMARY KEY AUTOINCREMENT, 'state' TEXT, 'name' TEXT, 'target' TEXT, 'port' TEXT, 'limit' TEXT, 'checkdns' INTEGER, 'timestamp' INTEGER, 'ended_at' INTEGER)");
             statement.executeUpdate("CREATE TABLE host ('id_analyse' INTEGER, 'ip' TEXT, 'hostname' TEXT, 'tcp' TEXT, 'udp' TEXT, 'at' INTEGER)");
             statement.executeUpdate("CREATE TABLE route ('id_analyse' INTEGER, 'uuid' TEXT, 'hop' INTEGER, 'from' TEXT, 'to' TEXT, 'at' INTEGER)");
         } catch (SQLException e) {
