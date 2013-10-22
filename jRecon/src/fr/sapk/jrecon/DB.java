@@ -52,14 +52,14 @@ public class DB {
         //close();
     }
 
-    static ResultSet query(String sql) throws SQLException {
+    static synchronized ResultSet query(String sql) throws SQLException {
         if (connection == null || statement == null || connection.isClosed()) {
             connect();
         }
         return statement.executeQuery(sql);
     }
 
-    static void exec(String sql) throws SQLException {
+    static synchronized void exec(String sql) throws SQLException {
         if (connection == null || statement == null) {
             connect();
         }
