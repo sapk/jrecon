@@ -33,6 +33,7 @@ import prefuse.data.io.GraphMLReader;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
+import prefuse.util.force.DragForce;
 import prefuse.visual.VisualItem;
 
 /**
@@ -75,8 +76,11 @@ public class UIFrameMap implements Runnable {
 
         // create an action list with an animated layout
         // the INFINITY parameter tells the action list to run indefinitely
-        ActionList layout = new ActionList(Activity.INFINITY);
-        layout.add(new ForceDirectedLayout("graph"));
+        ActionList layout = new ActionList(Activity.INFINITY,Activity.DEFAULT_STEP_TIME);
+        //ActionList layout = new ActionList(1000,Activity.DEFAULT_STEP_TIME);;
+        //layout.add(new ForceDirectedLayout("graph"));
+        //layout.add(new ForceDirectedLayout("graph",true));
+        layout.add(new ForceDirectedLayout("graph",false));
         layout.add(new RepaintAction());
         // add the actions to the visualization
         vis.putAction("color", color);

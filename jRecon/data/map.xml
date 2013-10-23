@@ -16,25 +16,32 @@
 
 <edge source="1" target="2"></edge>
 <node id="3">
- <data key="ip">148.60.248.254</data>
+ <data key="ip">148.60.83.67</data>
  </node>
 
-<edge source="2" target="3"></edge>
+<edge source="1" target="3"></edge>
 <node id="4">
- <data key="ip">129.20.252.251</data>
+ <data key="ip">148.60.83.92</data>
  </node>
 
-<edge source="3" target="4"></edge>
+<edge source="1" target="4"></edge>
 <node id="5">
- <data key="ip">178.33.103.228</data>
+ <data key="ip">148.60.83.131</data>
  </node>
 
-<edge source="4" target="5"></edge>
+<edge source="1" target="5"></edge>
 <node id="6">
- <data key="ip">37.187.4.165</data>
+ <data key="ip">148.60.83.152</data>
  </node>
 
-<edge source="5" target="6"></edge>
+<edge source="1" target="6"></edge>
+
+<edge source="1" target="1"></edge>
+<node id="7">
+ <data key="ip">148.60.83.164</data>
+ </node>
+
+<edge source="2" target="7"></edge>
 
 
 </graph>
