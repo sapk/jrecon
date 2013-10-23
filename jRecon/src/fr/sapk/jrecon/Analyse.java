@@ -48,8 +48,9 @@ public class Analyse extends Thread {
     private static String port;
     private static String limit;
     private static String checkdns;
+    private static String local_ip = null;
     private static int id;
-    
+
     private final double timeout_trace = 0.3;
 
     public Analyse(String[] params) {
@@ -176,16 +177,22 @@ public class Analyse extends Thread {
         int i = 1;
         String previous_ip = null;
         //TODO detect ip of output only one time
-        Socket s;
-        try {
-            s = new Socket("free.fr", 80);
-            previous_ip = s.getLocalAddress().getHostAddress();
-            s.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+        if (local_ip == null) {
+            Socket s;
+            try {
+                s = new Socket("free.fr", 80);
+                sleep(500);
+                previous_ip = s.getLocalAddress().getHostAddress();
+                s.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            previous_ip = local_ip;
         }
-        
-        
+
         String host_ip = null;
         for (String line : tracert.split("\n")) {
             if ((line.startsWith("  " + i) || line.startsWith(" " + i) || line.startsWith("" + i)) && !line.endsWith("!X")) {
@@ -233,13 +240,13 @@ public class Analyse extends Thread {
         try {
             Process traceRt;
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                System.out.println("tracert -4 -w "+timeout_trace*1000+" " + ((checkdns == "false") ? "-d" : "") + " " + ip);
+                System.out.println("tracert -4 -w " + timeout_trace * 1000 + " " + ((checkdns == "false") ? "-d" : "") + " " + ip);
                 //route += "win\n";
-                traceRt = Runtime.getRuntime().exec("tracert -w "+timeout_trace*1000+" " + ((checkdns == "false") ? "-d" : "") + " " + ip);
+                traceRt = Runtime.getRuntime().exec("tracert -w " + timeout_trace * 1000 + " " + ((checkdns == "false") ? "-d" : "") + " " + ip);
             } else {
-                System.out.println("traceroute -w "+timeout_trace+" " + ((checkdns == "false") ? "-n" : "") + " " + ip);
+                System.out.println("traceroute -w " + timeout_trace + " " + ((checkdns == "false") ? "-n" : "") + " " + ip);
                 //route += "unix\n";
-                traceRt = Runtime.getRuntime().exec("traceroute -w "+timeout_trace+" " + ((checkdns == "false") ? "-n" : "") + " " + ip);
+                traceRt = Runtime.getRuntime().exec("traceroute -w " + timeout_trace + " " + ((checkdns == "false") ? "-n" : "") + " " + ip);
             }
             BufferedReader buff = new BufferedReader(new InputStreamReader(traceRt.getInputStream()));
 
