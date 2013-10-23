@@ -19,36 +19,24 @@
 package fr.sapk.jrecon;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import prefuse.*;
-import prefuse.action.ActionList;
-import prefuse.action.RepaintAction;
-import prefuse.action.assignment.ColorAction;
-import prefuse.action.assignment.DataColorAction;
-import prefuse.action.layout.graph.ForceDirectedLayout;
-import prefuse.activity.Activity;
-import prefuse.controls.DragControl;
-import prefuse.controls.PanControl;
-import prefuse.controls.ZoomControl;
-import prefuse.data.Graph;
-import prefuse.data.io.DataIOException;
-import prefuse.data.io.GraphMLReader;
-import prefuse.render.DefaultRendererFactory;
-import prefuse.render.LabelRenderer;
-import prefuse.util.ColorLib;
-import prefuse.visual.VisualItem;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -56,28 +44,17 @@ import prefuse.visual.VisualItem;
  */
 public class UIFrameHome extends javax.swing.JFrame {
 
+    final static Charset ENCODING = StandardCharsets.UTF_8;
+
     /**
      * Creates new form NewJFrame
      */
     public UIFrameHome() {
         initComponents();
-        setIconImage(loadImageIcon("/img/icon.png").getImage());
+        setIconImage(Tool.loadImageIcon("/img/icon.png").getImage());
         setResizable(false);
         //setName("jRecon");
         setTitle("jRecon");
-    }
-
-    /**
-     * Returns an ImageIcon, or null if the path was invalid.
-     */
-    private static ImageIcon loadImageIcon(String path) {
-        URL imgURL = UIFrameHome.class.getResource(path);
-        if (imgURL != null) {
-            return new ImageIcon(imgURL);
-        } else {
-            System.err.println("Couldn't find file: " + path);
-            return null;
-        }
     }
 
     /**
@@ -111,6 +88,7 @@ public class UIFrameHome extends javax.swing.JFrame {
         ComboBoxResult = new javax.swing.JComboBox();
         jPanel2 = new javax.swing.JPanel();
         ButtonResetDB = new javax.swing.JButton();
+        ButtonImport = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         bProgressBar = new javax.swing.JProgressBar();
 
@@ -349,13 +327,22 @@ public class UIFrameHome extends javax.swing.JFrame {
             }
         });
 
+        ButtonImport.setText("Import");
+        ButtonImport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ButtonImportActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+            .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap(286, Short.MAX_VALUE)
-                .addComponent(ButtonResetDB, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(ButtonResetDB, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ButtonImport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -363,7 +350,9 @@ public class UIFrameHome extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(ButtonResetDB, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(189, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(ButtonImport, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(131, Short.MAX_VALUE))
         );
 
         jTabbedPane.addTab("Config", jPanel2);
@@ -451,84 +440,9 @@ public class UIFrameHome extends javax.swing.JFrame {
             buildXMLMap(selected.split("\\)")[0]);
 
 // TODO add your handling code here:
-            
-             new Thread(new Runnable() {
-            
-             @Override
-             public void run() {
-            
-             System.out.println("Test starting ...");
-             Graph graph = null;
-             try {
-             graph = new GraphMLReader().readGraph("data/map.xml");
-             } catch (DataIOException e) {
-             e.printStackTrace();
-             System.err.println("Error loading graph. Exiting...");
-             System.exit(1);
-             }
-             Visualization vis = new Visualization();
-             vis.add("graph", graph);
-            
-             LabelRenderer r = new LabelRenderer("ip");
-             r.setRoundedCorner(8, 8);
-            
-             vis.setRendererFactory(new DefaultRendererFactory(r));
-             // create our nominal color palette
-             // pink for females, baby blue for males
-             int[] palette = new int[]{
-             ColorLib.rgb(255, 180, 180), ColorLib.rgb(190, 190, 255)
-             };
-             // map nominal data values to colors using our provided palette
-             //DataColorAction fill = new DataColorAction("graph.nodes", "gender",
-             //Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-             // use black for node text
-             ColorAction fill = new ColorAction("graph.nodes", VisualItem.FILLCOLOR,ColorLib.rgb(160, 240, 160));
-             ColorAction text = new ColorAction("graph.nodes",
-             VisualItem.TEXTCOLOR, ColorLib.gray(0));
-             // use light grey for edges
-             ColorAction edges = new ColorAction("graph.edges",
-             VisualItem.STROKECOLOR, ColorLib.gray(200));
-            
-             // create an action list containing all color assignments
-             ActionList color = new ActionList();
-             color.add(fill);
-             color.add(text);
-             color.add(edges);
-            
-             // create an action list with an animated layout
-             // the INFINITY parameter tells the action list to run indefinitely
-             ActionList layout = new ActionList(Activity.INFINITY);
-             layout.add(new ForceDirectedLayout("graph"));
-             layout.add(new RepaintAction());
-             // add the actions to the visualization
-             vis.putAction("color", color);
-             vis.putAction("layout", layout);
-            
-             // create a new Display that pull from our Visualization
-             Display display = new Display(vis);
-             display.setSize(720, 500); // set display size
-             display.addControlListener(new DragControl()); // drag items around
-             display.addControlListener(new PanControl());  // pan with background left-drag
-             display.addControlListener(new ZoomControl()); // zoom with vertical right-drag
-            
-             // create a new window to hold the visualization
-             JFrame frame = new JFrame("Map");
-             frame.setIconImage(loadImageIcon("/img/icon.png").getImage());
-             // ensure application exits when window is closed
-             // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-             frame.add(display);
-             frame.pack();           // layout components in window
-             frame.setVisible(true); // show the window
-            
-             vis.run("color");  // assign the colors
-             vis.run("layout"); // start up the animated layout
-             System.out.println("Test ended");
-             }
-             }).start();
-             
-        } catch (IOException ex) {
-            Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
+            new Thread(new UIFrameMap("data/map.xml")).start();
+
+        } catch (IOException | SQLException ex) {
             Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_ButtonShowGraphActionPerformed
@@ -551,31 +465,28 @@ public class UIFrameHome extends javax.swing.JFrame {
                 file.delete();
             }
             file.createNewFile();
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write("/* export : " + analyse.getString("id_analyse") + " */" + "\n" + "\n" + "\n");
 
-            FileWriter writer = new FileWriter(file);
-            writer.write("/* export : " + analyse.getString("id_analyse") + " */" + "\n" + "\n" + "\n");
+                writer.write("INSERT INTO analyse  ('id_analyse', 'state', 'name', 'target', 'port', 'limit', 'checkdns', 'timestamp', 'ended_at') VALUES ($$ID_ANALYSE$$, 'Imported', '" + analyse.getString("name") + "', '" + analyse.getString("target") + "', '" + analyse.getString("port") + "', '" + analyse.getString("limit") + "', '" + analyse.getString("checkdns") + "', '" + analyse.getString("timestamp") + "', '" + analyse.getString("ended_at") + "') " + "\n");
 
-            writer.write("INSERT INTO analyse  ('id_analyse', 'state', 'name', 'target', 'port', 'limit', 'checkdns', 'timestamp', 'ended_at') VALUES ('$$ID_ANALYSE$$', 'Imported', '" + analyse.getString("name") + "', '" + analyse.getString("target") + "', '" + analyse.getString("port") + "', '" + analyse.getString("limit") + "', '" + analyse.getString("checkdns") + "', '" + analyse.getString("timestamp") + ", '" + analyse.getString("ended_at") + "'') " + "\n");
-
-            ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse=" + id);
-            while (host.next()) {
+                ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse=" + id);
+                while (host.next()) {
 //"INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + hostname + "', '[]', '[]', '" + timestamp + "') "
-                writer.write("INSERT INTO host  ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES ('$$ID_ANALYSE$$', '" + host.getString("ip") + "', '" + host.getString("hostname") + "', '" + host.getString("tcp") + "', '" + host.getString("udp") + "', '" + host.getString("at") + "') " + "\n");
-            }
-            writer.write("\n" + "\n");
-            //host.close();
-            ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse=" + id);
-            while (route.next()) {
+                    writer.write("INSERT INTO host  ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES ($$ID_ANALYSE$$, '" + host.getString("ip") + "', '" + host.getString("hostname") + "', '" + host.getString("tcp") + "', '" + host.getString("udp") + "', '" + host.getString("at") + "') " + "\n");
+                }
+                writer.write("\n" + "\n");
+                //host.close();
+                ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse=" + id);
+                while (route.next()) {
 //"INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + hostname + "', '[]', '[]', '" + timestamp + "') "
-                writer.write("INSERT INTO route  ('id_analyse', 'uuid', 'hop', 'from', 'to', 'at') VALUES ('$$ID_ANALYSE$$', '" + route.getString("uuid") + "', '" + route.getString("hop") + "', '" + route.getString("from") + "', '" + route.getString("to") + "', '" + route.getString("at") + "') " + "\n");
+                    writer.write("INSERT INTO route  ('id_analyse', 'uuid', 'hop', 'from', 'to', 'at') VALUES ($$ID_ANALYSE$$, '" + route.getString("uuid") + "', '" + route.getString("hop") + "', '" + route.getString("from") + "', '" + route.getString("to") + "', '" + route.getString("at") + "') " + "\n");
 
+                }
+                writer.flush();
             }
-            writer.flush();
-            writer.close();
 
-        } catch (SQLException ex) {
-            Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (SQLException | IOException ex) {
             Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_ButtonExportActionPerformed
@@ -597,7 +508,7 @@ public class UIFrameHome extends javax.swing.JFrame {
         System.out.println("PanelResultsComponentShown()");
         try {
             ResultSet analyse = DB.query("SELECT * FROM analyse");
-            List<String> names = new ArrayList<String>();
+            List<String> names = new ArrayList<>();
             while (analyse.next()) {
                 names.add(analyse.getString("id_analyse") + ") " + analyse.getString("name"));
                 //jComboBox1.add(analyse.getString("name"), null);
@@ -632,6 +543,35 @@ public class UIFrameHome extends javax.swing.JFrame {
             Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_ComboBoxResultActionPerformed
+
+    private void ButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonImportActionPerformed
+        //TODO show selection box import data
+        JFileChooser choix = new JFileChooser();
+        int retour = choix.showOpenDialog(this);
+        if (retour == JFileChooser.APPROVE_OPTION) {
+            System.out.println(choix.getSelectedFile().getAbsolutePath());
+            ResultSet result;
+            try {
+                result = DB.query("SELECT count(*) AS count FROM analyse");
+                int id_analyse = result.getInt("count") + 1;
+                System.out.println(id_analyse);
+                List<String> lines = Files.readAllLines(Paths.get(choix.getSelectedFile().getAbsolutePath()), ENCODING);
+                for (String l : lines) {
+                    //System.out.println(l);
+                    //TODO replace id_analyse in file 
+                    if (l.startsWith("INSERT INTO")) {
+                        System.out.println(l.replace("$$ID_ANALYSE$$", "" + id_analyse));
+                        DB.addQueue(l.replace("$$ID_ANALYSE$$", "" + id_analyse));
+                    }
+                }
+                DB.execQueue();
+            } catch (IOException | SQLException ex) {
+                Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+
+        }
+    }//GEN-LAST:event_ButtonImportActionPerformed
 
     private void Estimate() {
         //TODO check validity
@@ -740,6 +680,7 @@ public class UIFrameHome extends javax.swing.JFrame {
         //</editor-fold>
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new UIFrameHome().setVisible(true);
             }
@@ -749,6 +690,7 @@ public class UIFrameHome extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ButtonExport;
     public javax.swing.JButton ButtonGO;
+    private javax.swing.JButton ButtonImport;
     private javax.swing.JButton ButtonResetDB;
     private javax.swing.JButton ButtonShowGraph;
     private javax.swing.JButton ButtonSupprimer;
@@ -801,8 +743,8 @@ public class UIFrameHome extends javax.swing.JFrame {
                 + "\n\n");
 
         ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
-        List<String> nodes = new ArrayList<String>();
-        List<String> trajets = new ArrayList<String>();
+        List<String> nodes = new ArrayList<>();
+        List<String> trajets = new ArrayList<>();
         while (route.next()) {
             int source = 0;
             int target = 0;
@@ -814,9 +756,9 @@ public class UIFrameHome extends javax.swing.JFrame {
                         + " </node>\n");
                 source = nodes.size();
             } else {
-                source = nodes.indexOf(route.getString("from"))+1;
+                source = nodes.indexOf(route.getString("from")) + 1;
             }
-            
+
             if (!nodes.contains(route.getString("to"))) {
                 nodes.add(route.getString("to"));
                 writer.write("<node id=\"" + nodes.size() + "\">\n"
@@ -825,12 +767,12 @@ public class UIFrameHome extends javax.swing.JFrame {
                         + " </node>\n");
                 target = nodes.size();
             } else {
-                target = nodes.indexOf(route.getString("to"))+1;
+                target = nodes.indexOf(route.getString("to")) + 1;
             }
 
-            if (!trajets.contains(source+"->"+target)) {
-                trajets.add(source+"->"+target);
-                writer.write("\n<edge source=\""+source+"\" target=\""+target+"\"></edge>\n");
+            if (!trajets.contains(source + "->" + target)) {
+                trajets.add(source + "->" + target);
+                writer.write("\n<edge source=\"" + source + "\" target=\"" + target + "\"></edge>\n");
             }
         }
 

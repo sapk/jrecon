@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -50,6 +49,8 @@ public class Analyse extends Thread {
     private static String limit;
     private static String checkdns;
     private static int id;
+    
+    private final double timeout_trace = 0.3;
 
     public Analyse(String[] params) {
         System.out.println("Init analyse");
@@ -111,18 +112,22 @@ public class Analyse extends Thread {
     public void run() {
         System.out.println("Starting analyse ...");
         state = "Populating ...";
-        populate_db();
+        try {
+            populate_db();
+        } catch (SQLException ex) {
+            Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+        }
         state = "Running ...";
         recon();
         state = "Finished !";
         try {
-            DB.exec("UPDATE analyse SET state='Finished', ended_at="+System.currentTimeMillis()+" WHERE id_analyse=" + id + " ");
+            DB.exec("UPDATE analyse SET state='Finished', ended_at=" + System.currentTimeMillis() + " WHERE id_analyse=" + id + " ");
         } catch (SQLException ex) {
             Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private void populate_db() {
+    private void populate_db() throws SQLException {
         if (Tool.is_network(target)) {
             //TODO populate db with all ip possible.
             String ip_host = target.split("/")[0];
@@ -144,12 +149,8 @@ public class Analyse extends Thread {
                         Logger.getLogger(Analyse.class.getName()).log(Level.WARNING, null, ex);
                     }
                 }
-                try {
-                    DB.exec("INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + hostname + "', '[]', '[]', '" + timestamp + "') ");
-                } catch (SQLException ex) {
-                    //Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
-                    ex.printStackTrace();
-                }
+                DB.addQueue("INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + hostname + "', '[]', '[]', '" + timestamp + "') ");
+
             }
 
         } else if (Tool.is_hostname(target)) {
@@ -157,17 +158,13 @@ public class Analyse extends Thread {
                 //TODO support multiple ip DNS.
                 String ip = InetAddress.getByName(target).getHostAddress();
                 System.out.println("hostname : " + target + " @ " + ip);
-                try {
-                    DB.exec("INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + target + "', '[]', '[]', '" + timestamp + "') ");
-                } catch (SQLException ex) {
-                    //Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
-                    ex.printStackTrace();
-                }
+                DB.addQueue("INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + target + "', '[]', '[]', '" + timestamp + "') ");
 
             } catch (UnknownHostException ex) {
                 ex.printStackTrace();
             }
         }
+        DB.execQueue();
     }
 
     private void parse_traceroute(String tracert, String ip) {
@@ -178,7 +175,7 @@ public class Analyse extends Thread {
         System.out.println("Parsing traceroute ... : #" + tracert.hashCode());
         int i = 1;
         String previous_ip = null;
-        //TODO detect ip of output
+        //TODO detect ip of output only one time
         Socket s;
         try {
             s = new Socket("free.fr", 80);
@@ -187,6 +184,8 @@ public class Analyse extends Thread {
         } catch (IOException ex) {
             Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
         String host_ip = null;
         for (String line : tracert.split("\n")) {
             if ((line.startsWith("  " + i) || line.startsWith(" " + i) || line.startsWith("" + i)) && !line.endsWith("!X")) {
@@ -211,7 +210,7 @@ public class Analyse extends Thread {
                     try {
                         //TODO think of the necessity
                         //DB.exec("INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + target + "', '[]', '[]', '" + timestamp + "') ");
-                        DB.exec("INSERT INTO route ('id_analyse', 'uuid', 'hop', 'from', 'to', 'at') VALUES (" + id + ", '" + tracert.hashCode() + "', " + i + ", '" + previous_ip + "', '" + host_ip + "', '" + System.currentTimeMillis() + "') ");
+                        DB.addQueue("INSERT INTO route ('id_analyse', 'uuid', 'hop', 'from', 'to', 'at') VALUES (" + id + ", '" + tracert.hashCode() + "', " + i + ", '" + previous_ip + "', '" + host_ip + "', '" + System.currentTimeMillis() + "') ");
                     } catch (SQLException ex) {
                         Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -221,6 +220,11 @@ public class Analyse extends Thread {
                 i++;
             }
         }
+        try {
+            DB.execQueue();
+        } catch (SQLException ex) {
+            Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private String traceroute(String ip) {
@@ -229,13 +233,13 @@ public class Analyse extends Thread {
         try {
             Process traceRt;
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                System.out.println("tracert -4 -w 400 " + ((checkdns == "false") ? "-d" : "") + " " + ip);
+                System.out.println("tracert -4 -w "+timeout_trace*1000+" " + ((checkdns == "false") ? "-d" : "") + " " + ip);
                 //route += "win\n";
-                traceRt = Runtime.getRuntime().exec("tracert -w 400 " + ((checkdns == "false") ? "-d" : "") + " " + ip);
+                traceRt = Runtime.getRuntime().exec("tracert -w "+timeout_trace*1000+" " + ((checkdns == "false") ? "-d" : "") + " " + ip);
             } else {
-                System.out.println("traceroute -w 0.4 " + ((checkdns == "false") ? "-n" : "") + " " + ip);
+                System.out.println("traceroute -w "+timeout_trace+" " + ((checkdns == "false") ? "-n" : "") + " " + ip);
                 //route += "unix\n";
-                traceRt = Runtime.getRuntime().exec("traceroute -w 0.4 " + ((checkdns == "false") ? "-n" : "") + " " + ip);
+                traceRt = Runtime.getRuntime().exec("traceroute -w "+timeout_trace+" " + ((checkdns == "false") ? "-n" : "") + " " + ip);
             }
             BufferedReader buff = new BufferedReader(new InputStreamReader(traceRt.getInputStream()));
 

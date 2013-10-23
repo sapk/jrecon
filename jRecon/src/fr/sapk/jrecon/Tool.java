@@ -17,7 +17,9 @@
 package fr.sapk.jrecon;
 
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -77,9 +79,22 @@ public class Tool {
         return a + "." + b + "." + c + "." + d;
     }
 
-    public static String reverseDns(String hostIp) throws UnknownHostException{
+    public static String reverseDns(String hostIp) throws UnknownHostException {
         //TODO optimize for ip without reverseDNS.
         InetAddress addr = InetAddress.getByName(hostIp);
         return addr.getHostName();
+    }
+
+    /**
+     * Returns an ImageIcon, or null if the path was invalid.
+     */
+    public static ImageIcon loadImageIcon(String path) {
+        URL imgURL = UIFrameHome.class.getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        } else {
+            System.err.println("Couldn't find file: " + path);
+            return null;
+        }
     }
 }

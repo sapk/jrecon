@@ -64,12 +64,23 @@ public class DB {
             connect();
         }
         statement.executeUpdate(sql);
+        connection.commit();
     }
 
+    static synchronized void addQueue(String sql) throws SQLException {
+        statement.addBatch(sql);
+    }
+
+    static synchronized void execQueue() throws SQLException {
+        statement.executeBatch();
+        connection.commit();
+    }
+    
     private static void connect() {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + DBPath);
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             System.out.println("Connexion a " + DBPath + " avec succès");
         } catch (ClassNotFoundException notFoundException) {
