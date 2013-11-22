@@ -463,20 +463,30 @@ public class UIFrameHome extends javax.swing.JFrame {
             String id = analyse.getString("id_analyse");
             //query.
             File file;
+            do{
             JFileChooser choix = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+            "jRecon File", "jrc");
+            choix.setFileFilter(filter);
+            choix.removeChoosableFileFilter(choix.getAcceptAllFileFilter());
             int retour = choix.showOpenDialog(this);
             if (retour == JFileChooser.APPROVE_OPTION) {
                 System.out.println(choix.getSelectedFile().getAbsolutePath());
                 file = choix.getSelectedFile();
+                System.out.println(file.getName());
+                if(!(file.getName().endsWith("jrc")))
+                    file = new File(choix.getSelectedFile().getAbsolutePath() + ".jrc");
             }else{
                 System.out.println("Aucun fichier selectionné");
                 return;
             }
             //File file = new File("data/export/export-" + URLEncoder.encode(analyse.getString("name").split("#")[0]) + "-" + analyse.getString("timestamp") + ".sql");
-            if (file.exists()) {
-                System.out.println("Fichier déjà existant");
-                return;
-            }
+                if (file.exists()) {
+                    System.out.println("Fichier déjà existant");
+                }
+            } while(file.exists());
+                    
+            System.out.println(file.getAbsolutePath());
             file.createNewFile();
             try (FileWriter writer = new FileWriter(file)) {
                 writer.write("/* export : " + analyse.getString("id_analyse") + " */" + "\n" + "\n" + "\n");
