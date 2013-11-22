@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  *
@@ -460,9 +462,20 @@ public class UIFrameHome extends javax.swing.JFrame {
             ResultSet analyse = DB.query("SELECT * FROM analyse WHERE id_analyse=" + selected.split("\\)")[0]);
             String id = analyse.getString("id_analyse");
             //query.
-            File file = new File("data/export/export-" + URLEncoder.encode(analyse.getString("name").split("#")[0]) + "-" + analyse.getString("timestamp") + ".sql");
+            File file;
+            JFileChooser choix = new JFileChooser();
+            int retour = choix.showOpenDialog(this);
+            if (retour == JFileChooser.APPROVE_OPTION) {
+                System.out.println(choix.getSelectedFile().getAbsolutePath());
+                file = choix.getSelectedFile();
+            }else{
+                System.out.println("Aucun fichier selectionné");
+                return;
+            }
+            //File file = new File("data/export/export-" + URLEncoder.encode(analyse.getString("name").split("#")[0]) + "-" + analyse.getString("timestamp") + ".sql");
             if (file.exists()) {
-                file.delete();
+                System.out.println("Fichier déjà existant");
+                return;
             }
             file.createNewFile();
             try (FileWriter writer = new FileWriter(file)) {
@@ -547,6 +560,10 @@ public class UIFrameHome extends javax.swing.JFrame {
     private void ButtonImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonImportActionPerformed
         //TODO show selection box import data
         JFileChooser choix = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+        "jRecon File", "jrc");
+        choix.setFileFilter(filter);
+        choix.removeChoosableFileFilter(choix.getAcceptAllFileFilter());
         int retour = choix.showOpenDialog(this);
         if (retour == JFileChooser.APPROVE_OPTION) {
             System.out.println(choix.getSelectedFile().getAbsolutePath());

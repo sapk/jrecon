@@ -7,41 +7,6 @@
 <key id="ip" for="node" attr.name="ip" attr.type="string"/>
 
 
-<node id="1">
- <data key="ip">148.60.83.161</data>
- </node>
-<node id="2">
- <data key="ip">null</data>
- </node>
-
-<edge source="1" target="2"></edge>
-<node id="3">
- <data key="ip">148.60.83.67</data>
- </node>
-
-<edge source="1" target="3"></edge>
-<node id="4">
- <data key="ip">148.60.83.92</data>
- </node>
-
-<edge source="1" target="4"></edge>
-<node id="5">
- <data key="ip">148.60.83.131</data>
- </node>
-
-<edge source="1" target="5"></edge>
-<node id="6">
- <data key="ip">148.60.83.152</data>
- </node>
-
-<edge source="1" target="6"></edge>
-
-<edge source="1" target="1"></edge>
-<node id="7">
- <data key="ip">148.60.83.164</data>
- </node>
-
-<edge source="2" target="7"></edge>
 
 
 </graph>
