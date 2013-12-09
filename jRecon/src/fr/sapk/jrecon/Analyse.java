@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -180,8 +181,10 @@ public class Analyse extends Thread {
         if (local_ip == null) {
             Socket s;
             try {
-                s = new Socket("free.fr", 80);
-                sleep(500);
+                //s = new Socket("free.fr", 80);
+                // focntionnait sous linux mais à adapter sous windows
+                s = new Socket(Inet4Address.getByName("free.fr"), 80);
+                sleep(1500);
                 previous_ip = s.getLocalAddress().getHostAddress();
                 s.close();
             } catch (IOException ex) {
@@ -192,7 +195,7 @@ public class Analyse extends Thread {
         } else {
             previous_ip = local_ip;
         }
-
+        System.out.println("local ip : " + local_ip);
         String host_ip = null;
         for (String line : tracert.split("\n")) {
             if ((line.startsWith("  " + i) || line.startsWith(" " + i) || line.startsWith("" + i)) && !line.endsWith("!X")) {
@@ -240,9 +243,9 @@ public class Analyse extends Thread {
         try {
             Process traceRt;
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                System.out.println("tracert -4 -w " + timeout_trace * 1000 + " " + ((checkdns == "false") ? "-d" : "") + " " + ip);
+                System.out.println("tracert -4 -w " + (int) (timeout_trace * 1000) + " " + ((checkdns == "false") ? "-d" : "") + " " + ip);
                 //route += "win\n";
-                traceRt = Runtime.getRuntime().exec("tracert -w " + timeout_trace * 1000 + " " + ((checkdns == "false") ? "-d" : "") + " " + ip);
+                traceRt = Runtime.getRuntime().exec("tracert -w " + (int) (timeout_trace * 1000) + " " + ((checkdns == "false") ? "-d" : "") + " " + ip);
             } else {
                 System.out.println("traceroute -w " + timeout_trace + " " + ((checkdns == "false") ? "-n" : "") + " " + ip);
                 //route += "unix\n";

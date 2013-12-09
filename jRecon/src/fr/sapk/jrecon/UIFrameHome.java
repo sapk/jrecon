@@ -19,16 +19,11 @@
 package fr.sapk.jrecon;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,7 +33,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.filechooser.FileSystemView;
 
 /**
  *
@@ -440,9 +434,12 @@ public class UIFrameHome extends javax.swing.JFrame {
         //TODO
         try {
             buildXMLMap(selected.split("\\)")[0]);
-
-// TODO add your handling code here:
-            new Thread(new UIFrameMap("data/map.xml")).start();
+            try {
+                // TODO add your handling code here:
+                new Thread(new UIFrameMap("data/map.xml")).start();
+            } catch (Throwable ex) {
+                Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
         } catch (IOException | SQLException ex) {
             Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
@@ -760,17 +757,31 @@ public class UIFrameHome extends javax.swing.JFrame {
         FileWriter writer = new FileWriter(file);
 
         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                + "<!--  An excerpt of an egocentric social network  -->\n"
+                + "<!--  Data for visualitation of a network  -->\n"
                 + "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\">\n"
                 + "<graph edgedefault=\"undirected\">\n"
                 + " \n"
                 + "<!-- data schema -->\n"
                 + "<key id=\"ip\" for=\"node\" attr.name=\"ip\" attr.type=\"string\"/>\n"
-                //     + "<key id=\"hostname\" for=\"node\" attr.name=\"hostname\" attr.type=\"string\"/>\n"
+                + "<key id=\"hostname\" for=\"node\" attr.name=\"hostname\" attr.type=\"string\"/>\n"
                 + "\n\n");
-
-        ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
+        ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse='" + id_analyse + "'");
         List<String> nodes = new ArrayList<>();
+        while (host.next()) {
+            //TODO optimize to add info if note existing
+             if (!nodes.contains(host.getString("ip"))) {
+                nodes.add(host.getString("ip"));
+                writer.write("<node id=\"" + nodes.size() + "\">\n"
+                        + " <data key=\"ip\">" + host.getString("ip") + "</data>\n"
+                        + " <data key=\"hostname\">" + host.getString("hostname") + "</data>\n"
+             //           + " <data key=\"tcp\">" + host.getString("tcp") + "</data>\n"
+             //           + " <data key=\"udp\">" + host.getString("udp") + "</data>\n"
+             //           + " <data key=\"at\">" + host.getString("at") + "</data>\n"
+                        + " </node>\n");
+            }
+        }
+        ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
+        //List<String> nodes = new ArrayList<>();
         List<String> trajets = new ArrayList<>();
         while (route.next()) {
             int source = 0;
@@ -779,7 +790,8 @@ public class UIFrameHome extends javax.swing.JFrame {
                 nodes.add(route.getString("from"));
                 writer.write("<node id=\"" + nodes.size() + "\">\n"
                         + " <data key=\"ip\">" + route.getString("from") + "</data>\n"
-                        //  + " <data key=\"hostname\">M</data>\n"
+                        //  + " <data key=\"at\">" + route.getString("at") + "</data>\n"
+                        + " <data key=\"hostname\">" + route.getString("from") + "</data>\n"
                         + " </node>\n");
                 source = nodes.size();
             } else {
@@ -790,7 +802,8 @@ public class UIFrameHome extends javax.swing.JFrame {
                 nodes.add(route.getString("to"));
                 writer.write("<node id=\"" + nodes.size() + "\">\n"
                         + " <data key=\"ip\">" + route.getString("to") + "</data>\n"
-                        //  + " <data key=\"hostname\">M</data>\n"
+                        //+ " <data key=\"at\">" + route.getString("at") + "</data>\n"
+                        + " <data key=\"hostname\">" + route.getString("from") + "</data>\n"
                         + " </node>\n");
                 target = nodes.size();
             } else {

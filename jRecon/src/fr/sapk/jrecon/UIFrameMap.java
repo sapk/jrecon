@@ -33,7 +33,6 @@ import prefuse.data.io.GraphMLReader;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
-import prefuse.util.force.DragForce;
 import prefuse.visual.VisualItem;
 
 
@@ -46,16 +45,17 @@ public class UIFrameMap implements Runnable {
     private Graph graph = null;
     private Visualization vis = null;
 
-    public UIFrameMap(String file) {
+    public UIFrameMap(String file) throws Throwable {
 
         System.out.println("Map visualtion starting ...");
+        System.out.println(file);
         try {
             graph = new GraphMLReader().readGraph(file);
         } catch (DataIOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.err.println("Error loading graph. Exiting...");
             //System.exit(1);
-
+            this.finalize();
         }
 
     }
@@ -77,6 +77,7 @@ public class UIFrameMap implements Runnable {
 
         // create an action list with an animated layout
         // the INFINITY parameter tells the action list to run indefinitely
+        //
         ActionList layout = new ActionList(Activity.INFINITY,Activity.DEFAULT_STEP_TIME);
         //ActionList layout = new ActionList(1000,Activity.DEFAULT_STEP_TIME);;
         //layout.add(new ForceDirectedLayout("graph"));
