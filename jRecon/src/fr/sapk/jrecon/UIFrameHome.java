@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -764,6 +765,9 @@ public class UIFrameHome extends javax.swing.JFrame {
                 + "<!-- data schema -->\n"
                 + "<key id=\"ip\" for=\"node\" attr.name=\"ip\" attr.type=\"string\"/>\n"
                 + "<key id=\"hostname\" for=\"node\" attr.name=\"hostname\" attr.type=\"string\"/>\n"
+           //     + "<key id=\"at\" for=\"node\" attr.name=\"at\" attr.type=\"DateTime\"/>\n"
+                + ""
+                + "<key id=\"size\" for=\"edge\" attr.name=\"size\" attr.type=\"Double\"/>\n"
                 + "\n\n");
         ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse='" + id_analyse + "'");
         List<String> nodes = new ArrayList<>();
@@ -790,7 +794,7 @@ public class UIFrameHome extends javax.swing.JFrame {
                 nodes.add(route.getString("from"));
                 writer.write("<node id=\"" + nodes.size() + "\">\n"
                         + " <data key=\"ip\">" + route.getString("from") + "</data>\n"
-                        //  + " <data key=\"at\">" + route.getString("at") + "</data>\n"
+                //        + " <data key=\"at\">" + route.getString("at") + "</data>\n"
                         + " <data key=\"hostname\">" + route.getString("from") + "</data>\n"
                         + " </node>\n");
                 source = nodes.size();
@@ -802,8 +806,8 @@ public class UIFrameHome extends javax.swing.JFrame {
                 nodes.add(route.getString("to"));
                 writer.write("<node id=\"" + nodes.size() + "\">\n"
                         + " <data key=\"ip\">" + route.getString("to") + "</data>\n"
-                        //+ " <data key=\"at\">" + route.getString("at") + "</data>\n"
-                        + " <data key=\"hostname\">" + route.getString("from") + "</data>\n"
+             //           + " <data key=\"at\">" + route.getString("at") + "</data>\n"
+                        + " <data key=\"hostname\">" + route.getString("to") + "</data>\n"
                         + " </node>\n");
                 target = nodes.size();
             } else {
@@ -812,7 +816,15 @@ public class UIFrameHome extends javax.swing.JFrame {
 
             if (!trajets.contains(source + "->" + target)) {
                 trajets.add(source + "->" + target);
-                writer.write("\n<edge source=\"" + source + "\" target=\"" + target + "\"></edge>\n");
+                //TODO determine size
+                int count = (new DB()).count("SELECT * FROM route WHERE `from`='\" + source + \"' AND `to`='\" + target + \"';");
+                System.out.println("count : "+count);
+               // Array f = route.getArray("from");
+               // Array t = route.getArray("to");
+                writer.write("\n<edge source=\"" + source + "\" target=\"" + target + "\">"
+                       // + " <data key=\"size\">" + DB.count("SELECT * FROM route WHERE `from`='" + source + "' AND `to`='" + target + "';") + "</data>\n"
+                        + " <data key=\"size\">" + 5 + "</data>\n"
+                        + "</edge>\n");
             }
         }
 

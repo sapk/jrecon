@@ -22,6 +22,8 @@ import prefuse.Visualization;
 import prefuse.action.ActionList;
 import prefuse.action.RepaintAction;
 import prefuse.action.assignment.ColorAction;
+import prefuse.action.assignment.DataColorAction;
+import prefuse.action.assignment.DataSizeAction;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
 import prefuse.controls.DragControl;
@@ -33,6 +35,7 @@ import prefuse.data.io.GraphMLReader;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
+import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
 
 
@@ -69,11 +72,23 @@ public class UIFrameMap implements Runnable {
         ColorAction fill = new ColorAction("graph.nodes", VisualItem.FILLCOLOR, ColorLib.rgb(160, 240, 160));
         ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR, ColorLib.gray(0));
         ColorAction edges = new ColorAction("graph.edges", VisualItem.STROKECOLOR, ColorLib.gray(200));
+        //DataColorAction edges = new DataColorAction("graph.edges",;
 
+        DataSizeAction sizeAction = new DataSizeAction("graph.edges","size");
+        //TODO tweak this avlue for beautiful vis
+        sizeAction.setMinimumSize(15);
+       
+        //sizeAction.setBinCount(500);
+        // sizeAction.getScale();
+                
         ActionList color = new ActionList();
         color.add(fill);
         color.add(text);
         color.add(edges);
+
+        color.add(sizeAction);
+
+        //TODO 37.187.4.165
 
         // create an action list with an animated layout
         // the INFINITY parameter tells the action list to run indefinitely

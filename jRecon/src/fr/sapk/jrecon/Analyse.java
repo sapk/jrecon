@@ -83,7 +83,7 @@ public class Analyse extends Thread {
         if (port != null && port.split("-").length == 2) {
             multi += (Integer.parseInt(port.split("-")[1]) - Integer.parseInt(port.split("-")[0]) + 1);
         }
-        if (checkdns == "true") {
+        if ("true".equals(checkdns)) {
             multi += 1;
         }
 
@@ -144,7 +144,7 @@ public class Analyse extends Thread {
                 String ip = Tool.LongtoIPv4(i);
                 //   System.out.println(ip);
                 String hostname = ip;
-                if (checkdns == "true") {
+                if ("true".equals(checkdns)) {
                     try {
                         hostname = Tool.reverseDns(ip);
                     } catch (UnknownHostException ex) {

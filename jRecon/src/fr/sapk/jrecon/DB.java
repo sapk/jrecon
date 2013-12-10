@@ -17,6 +17,7 @@
 package fr.sapk.jrecon;
 
 import java.io.File;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -52,6 +53,11 @@ public class DB {
         //close();
     }
 
+    int count(String sql) throws SQLException {
+        //TODO 
+        return 0;
+    }
+
     static synchronized ResultSet query(String sql) throws SQLException {
         if (connection == null || statement == null || connection.isClosed()) {
             connect();
@@ -75,7 +81,7 @@ public class DB {
         statement.executeBatch();
         connection.commit();
     }
-    
+
     private static void connect() {
         try {
             Class.forName("org.sqlite.JDBC");

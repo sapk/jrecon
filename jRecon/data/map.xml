@@ -1,44 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  An excerpt of an egocentric social network  -->
+<!--  Data for visualitation of a network  -->
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns">
 <graph edgedefault="undirected">
  
 <!-- data schema -->
 <key id="ip" for="node" attr.name="ip" attr.type="string"/>
 <key id="hostname" for="node" attr.name="hostname" attr.type="string"/>
+<key id="size" for="edge" attr.name="size" attr.type="Double"/>
 
 
 <node id="1">
- <data key="ip">8.8.8.8</data>
- <data key="hostname">8.8.8.8</data>
+ <data key="ip">37.187.4.160</data>
+ <data key="hostname">37.187.4.160</data>
  </node>
 <node id="2">
- <data key="ip">8.8.8.9</data>
- <data key="hostname">8.8.8.9</data>
+ <data key="ip">37.187.4.161</data>
+ <data key="hostname">37.187.4.161</data>
  </node>
 <node id="3">
- <data key="ip">8.8.8.10</data>
- <data key="hostname">8.8.8.10</data>
+ <data key="ip">37.187.4.162</data>
+ <data key="hostname">37.187.4.162</data>
  </node>
 <node id="4">
- <data key="ip">8.8.8.11</data>
- <data key="hostname">8.8.8.11</data>
+ <data key="ip">37.187.4.163</data>
+ <data key="hostname">37.187.4.163</data>
  </node>
 <node id="5">
- <data key="ip">8.8.8.12</data>
- <data key="hostname">8.8.8.12</data>
+ <data key="ip">37.187.4.164</data>
+ <data key="hostname">37.187.4.164</data>
  </node>
 <node id="6">
- <data key="ip">8.8.8.13</data>
- <data key="hostname">8.8.8.13</data>
+ <data key="ip">37.187.4.165</data>
+ <data key="hostname">37.187.4.165</data>
  </node>
 <node id="7">
- <data key="ip">8.8.8.14</data>
- <data key="hostname">8.8.8.14</data>
+ <data key="ip">37.187.4.166</data>
+ <data key="hostname">37.187.4.166</data>
  </node>
 <node id="8">
- <data key="ip">8.8.8.15</data>
- <data key="hostname">8.8.8.15</data>
+ <data key="ip">37.187.4.167</data>
+ <data key="hostname">37.187.4.167</data>
  </node>
 <node id="9">
  <data key="ip">0:0:0:0:0:0:0:1</data>
@@ -46,196 +47,135 @@
  </node>
 <node id="10">
  <data key="ip">10.8.0.1</data>
- <data key="hostname">0:0:0:0:0:0:0:1</data>
- </node>
-
-<edge source="9" target="10"></edge>
-<node id="11">
- <data key="ip">88.191.125.1</data>
  <data key="hostname">10.8.0.1</data>
  </node>
 
-<edge source="10" target="11"></edge>
+<edge source="9" target="10"> <data key="size">5</data>
+</edge>
+<node id="11">
+ <data key="ip">88.191.125.1</data>
+ <data key="hostname">88.191.125.1</data>
+ </node>
+
+<edge source="10" target="11"> <data key="size">5</data>
+</edge>
 <node id="12">
- <data key="ip">88.191.1.165</data>
- <data key="hostname">88.191.125.1</data>
- </node>
-
-<edge source="11" target="12"></edge>
-<node id="13">
- <data key="ip">213.242.121.41</data>
- <data key="hostname">88.191.1.165</data>
- </node>
-
-<edge source="12" target="13"></edge>
-<node id="14">
- <data key="ip">4.69.168.62</data>
- <data key="hostname">213.242.121.41</data>
- </node>
-
-<edge source="13" target="14"></edge>
-<node id="15">
- <data key="ip">4.69.161.77</data>
- <data key="hostname">4.69.168.62</data>
- </node>
-
-<edge source="14" target="15"></edge>
-<node id="16">
- <data key="ip">4.69.143.105</data>
- <data key="hostname">4.69.161.77</data>
- </node>
-
-<edge source="15" target="16"></edge>
-<node id="17">
- <data key="ip">4.69.153.126</data>
- <data key="hostname">4.69.143.105</data>
- </node>
-
-<edge source="16" target="17"></edge>
-<node id="18">
- <data key="ip">4.69.166.1</data>
- <data key="hostname">4.69.153.126</data>
- </node>
-
-<edge source="17" target="18"></edge>
-<node id="19">
- <data key="ip">209.85.244.246</data>
- <data key="hostname">4.69.166.1</data>
- </node>
-
-<edge source="18" target="19"></edge>
-<node id="20">
- <data key="ip">209.85.255.78</data>
- <data key="hostname">209.85.244.246</data>
- </node>
-
-<edge source="19" target="20"></edge>
-<node id="21">
- <data key="ip">209.85.253.94</data>
- <data key="hostname">209.85.255.78</data>
- </node>
-
-<edge source="20" target="21"></edge>
-<node id="22">
- <data key="ip">72.14.232.134</data>
- <data key="hostname">209.85.253.94</data>
- </node>
-
-<edge source="21" target="22"></edge>
-<node id="23">
- <data key="ip">72.14.238.43</data>
- <data key="hostname">72.14.232.134</data>
- </node>
-
-<edge source="22" target="23"></edge>
-
-<edge source="23" target="1"></edge>
-<node id="24">
- <data key="ip">4.69.168.190</data>
- <data key="hostname">213.242.121.41</data>
- </node>
-
-<edge source="13" target="24"></edge>
-<node id="25">
- <data key="ip">4.69.161.85</data>
- <data key="hostname">4.69.168.190</data>
- </node>
-
-<edge source="24" target="25"></edge>
-<node id="26">
- <data key="ip">4.69.143.113</data>
- <data key="hostname">4.69.161.85</data>
- </node>
-
-<edge source="25" target="26"></edge>
-<node id="27">
- <data key="ip">4.69.153.114</data>
- <data key="hostname">4.69.143.113</data>
- </node>
-
-<edge source="26" target="27"></edge>
-
-<edge source="27" target="18"></edge>
-<node id="28">
  <data key="ip">88.191.1.149</data>
- <data key="hostname">88.191.125.1</data>
- </node>
-
-<edge source="11" target="28"></edge>
-<node id="29">
- <data key="ip">195.154.1.2</data>
  <data key="hostname">88.191.1.149</data>
  </node>
 
-<edge source="28" target="29"></edge>
-
-<edge source="29" target="13"></edge>
-<node id="30">
- <data key="ip">4.69.143.109</data>
- <data key="hostname">4.69.161.77</data>
+<edge source="11" target="12"> <data key="size">5</data>
+</edge>
+<node id="13">
+ <data key="ip">212.27.58.41</data>
+ <data key="hostname">212.27.58.41</data>
  </node>
 
-<edge source="15" target="30"></edge>
-<node id="31">
- <data key="ip">4.69.153.118</data>
- <data key="hostname">4.69.143.109</data>
+<edge source="12" target="13"> <data key="size">5</data>
+</edge>
+<node id="14">
+ <data key="ip">91.121.128.164</data>
+ <data key="hostname">91.121.128.164</data>
  </node>
 
-<edge source="30" target="31"></edge>
-
-<edge source="31" target="18"></edge>
-<node id="32">
- <data key="ip">4.69.143.101</data>
- <data key="hostname">4.69.161.85</data>
+<edge source="13" target="14"> <data key="size">5</data>
+</edge>
+<node id="15">
+ <data key="ip">178.33.103.234</data>
+ <data key="hostname">178.33.103.234</data>
  </node>
 
-<edge source="25" target="32"></edge>
+<edge source="14" target="15"> <data key="size">5</data>
+</edge>
 
-<edge source="32" target="31"></edge>
-<node id="33">
- <data key="ip">4.69.166.9</data>
- <data key="hostname">4.69.153.118</data>
+<edge source="15" target="1"> <data key="size">5</data>
+</edge>
+<node id="16">
+ <data key="ip">37.187.36.217</data>
+ <data key="hostname">37.187.36.217</data>
  </node>
 
-<edge source="31" target="33"></edge>
-<node id="34">
- <data key="ip">4.69.168.254</data>
- <data key="hostname">213.242.121.41</data>
+<edge source="14" target="16"> <data key="size">5</data>
+</edge>
+<node id="17">
+ <data key="ip">178.33.103.228</data>
+ <data key="hostname">178.33.103.228</data>
  </node>
 
-<edge source="13" target="34"></edge>
-<node id="35">
- <data key="ip">4.69.161.89</data>
- <data key="hostname">4.69.168.254</data>
+<edge source="16" target="17"> <data key="size">5</data>
+</edge>
+
+<edge source="17" target="2"> <data key="size">5</data>
+</edge>
+
+<edge source="15" target="17"> <data key="size">5</data>
+</edge>
+
+<edge source="17" target="3"> <data key="size">5</data>
+</edge>
+
+<edge source="16" target="4"> <data key="size">5</data>
+</edge>
+
+<edge source="17" target="5"> <data key="size">5</data>
+</edge>
+<node id="18">
+ <data key="ip">88.191.1.165</data>
+ <data key="hostname">88.191.1.165</data>
  </node>
 
-<edge source="34" target="35"></edge>
-
-<edge source="35" target="16"></edge>
-
-<edge source="35" target="32"></edge>
-<node id="36">
- <data key="ip">4.69.166.13</data>
- <data key="hostname">4.69.153.118</data>
+<edge source="11" target="18"> <data key="size">5</data>
+</edge>
+<node id="19">
+ <data key="ip">88.191.1.130</data>
+ <data key="hostname">88.191.1.130</data>
  </node>
 
-<edge source="31" target="36"></edge>
-<node id="37">
- <data key="ip">4.69.153.122</data>
- <data key="hostname">4.69.143.101</data>
+<edge source="18" target="19"> <data key="size">5</data>
+</edge>
+<node id="20">
+ <data key="ip">212.27.58.49</data>
+ <data key="hostname">212.27.58.49</data>
  </node>
 
-<edge source="32" target="37"></edge>
-
-<edge source="37" target="18"></edge>
-
-<edge source="25" target="30"></edge>
-<node id="38">
- <data key="ip">4.69.166.5</data>
- <data key="hostname">4.69.153.118</data>
+<edge source="19" target="20"> <data key="size">5</data>
+</edge>
+<node id="21">
+ <data key="ip">212.27.59.102</data>
+ <data key="hostname">212.27.59.102</data>
  </node>
 
-<edge source="31" target="38"></edge>
+<edge source="20" target="21"> <data key="size">5</data>
+</edge>
+<node id="22">
+ <data key="ip">78.254.249.97</data>
+ <data key="hostname">78.254.249.97</data>
+ </node>
+
+<edge source="21" target="22"> <data key="size">5</data>
+</edge>
+
+<edge source="22" target="14"> <data key="size">5</data>
+</edge>
+<node id="23">
+ <data key="ip">178.33.103.224</data>
+ <data key="hostname">178.33.103.224</data>
+ </node>
+
+<edge source="16" target="23"> <data key="size">5</data>
+</edge>
+
+<edge source="23" target="6"> <data key="size">5</data>
+</edge>
+
+<edge source="15" target="23"> <data key="size">5</data>
+</edge>
+
+<edge source="23" target="7"> <data key="size">5</data>
+</edge>
+
+<edge source="17" target="8"> <data key="size">5</data>
+</edge>
 
 
 </graph>
