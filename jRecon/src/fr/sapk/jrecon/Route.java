@@ -47,7 +47,14 @@ public class Route {
     }
 
     public Route(String uuid, String hop) throws SQLException {
-        db.query("SELECT * FROM route WHERE uuid='" + uuid + "' AND hop='"+hop+"';");
+        ResultSet ret = db.query("SELECT * FROM route WHERE uuid='" + uuid + "' AND hop='" + hop + "';");
+        if (ret.next()) {
+            this.uuid = ret.getString("uuid");
+            this.from = ret.getString("from");
+            this.to = ret.getString("to");
+            this.hop = ret.getInt("hop");
+            this.at = ret.getInt("at");
+        }
     }
 
 }
