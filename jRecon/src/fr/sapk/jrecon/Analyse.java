@@ -216,6 +216,12 @@ public class Analyse extends Thread {
                     //TODO check on all system (Archlinxu ok !)
                     host_ip = host.split(" ")[1].substring(1, host.split(" ")[1].length() - 1);
                     System.out.println("hostname :" + previous_ip + ">" + host);
+                    try {
+                        //TODO check if already exist and not to replace
+                        DB.addQueue("INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + host_ip + "', '" + host.split(" ")[0] + "', '[]', '[]', '" + System.currentTimeMillis()  + "') ");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
 
                 if (host_ip != previous_ip) {
