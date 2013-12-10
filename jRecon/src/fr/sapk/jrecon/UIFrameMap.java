@@ -35,7 +35,6 @@ import prefuse.data.io.GraphMLReader;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
-import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
 
 
@@ -76,7 +75,7 @@ public class UIFrameMap implements Runnable {
 
         DataSizeAction sizeAction = new DataSizeAction("graph.edges","size");
         //TODO tweak this avlue for beautiful vis
-        sizeAction.setMinimumSize(15);
+        //sizeAction.setMinimumSize(15);
        
         //sizeAction.setBinCount(500);
         // sizeAction.getScale();

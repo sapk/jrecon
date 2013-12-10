@@ -70,7 +70,7 @@ public class UI extends Thread {
         public void run() {
 
             while (true) {
-                if (p.state == "Running ...") {
+                if ("Running ...".equals(p.state)) {
                    // System.out.println("Avencement : " + p.request_done + " / " + p.request_total + "");
                     f.bProgressBar.setString(p.request_done + " / " + p.request_total);
                 } else {

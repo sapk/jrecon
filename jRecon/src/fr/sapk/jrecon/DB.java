@@ -17,7 +17,6 @@
 package fr.sapk.jrecon;
 
 import java.io.File;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;

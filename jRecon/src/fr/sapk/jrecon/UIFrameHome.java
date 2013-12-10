@@ -434,7 +434,7 @@ public class UIFrameHome extends javax.swing.JFrame {
         String selected = ComboBoxResult.getSelectedItem().toString();
         //TODO
         try {
-            buildXMLMap(selected.split("\\)")[0]);
+            buildDATAMap(selected.split("\\)")[0]);
             try {
                 // TODO add your handling code here:
                 new Thread(new UIFrameMap("data/map.xml")).start();
@@ -461,29 +461,30 @@ public class UIFrameHome extends javax.swing.JFrame {
             String id = analyse.getString("id_analyse");
             //query.
             File file;
-            do{
-            JFileChooser choix = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter(
-            "jRecon File", "jrc");
-            choix.setFileFilter(filter);
-            choix.removeChoosableFileFilter(choix.getAcceptAllFileFilter());
-            int retour = choix.showOpenDialog(this);
-            if (retour == JFileChooser.APPROVE_OPTION) {
-                System.out.println(choix.getSelectedFile().getAbsolutePath());
-                file = choix.getSelectedFile();
-                System.out.println(file.getName());
-                if(!(file.getName().endsWith("jrc")))
-                    file = new File(choix.getSelectedFile().getAbsolutePath() + ".jrc");
-            }else{
-                System.out.println("Aucun fichier selectionné");
-                return;
-            }
-            //File file = new File("data/export/export-" + URLEncoder.encode(analyse.getString("name").split("#")[0]) + "-" + analyse.getString("timestamp") + ".sql");
+            do {
+                JFileChooser choix = new JFileChooser();
+                FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                        "jRecon File", "jrc");
+                choix.setFileFilter(filter);
+                choix.removeChoosableFileFilter(choix.getAcceptAllFileFilter());
+                int retour = choix.showOpenDialog(this);
+                if (retour == JFileChooser.APPROVE_OPTION) {
+                    System.out.println(choix.getSelectedFile().getAbsolutePath());
+                    file = choix.getSelectedFile();
+                    System.out.println(file.getName());
+                    if (!(file.getName().endsWith("jrc"))) {
+                        file = new File(choix.getSelectedFile().getAbsolutePath() + ".jrc");
+                    }
+                } else {
+                    System.out.println("Aucun fichier selectionné");
+                    return;
+                }
+                //File file = new File("data/export/export-" + URLEncoder.encode(analyse.getString("name").split("#")[0]) + "-" + analyse.getString("timestamp") + ".sql");
                 if (file.exists()) {
                     System.out.println("Fichier déjà existant");
                 }
-            } while(file.exists());
-                    
+            } while (file.exists());
+
             System.out.println(file.getAbsolutePath());
             file.createNewFile();
             try (FileWriter writer = new FileWriter(file)) {
@@ -569,7 +570,7 @@ public class UIFrameHome extends javax.swing.JFrame {
         //TODO show selection box import data
         JFileChooser choix = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-        "jRecon File", "jrc");
+                "jRecon File", "jrc");
         choix.setFileFilter(filter);
         choix.removeChoosableFileFilter(choix.getAcceptAllFileFilter());
         int retour = choix.showOpenDialog(this);
@@ -748,7 +749,54 @@ public class UIFrameHome extends javax.swing.JFrame {
         setAll(true);
     }
 
-    void buildXMLMap(String id_analyse) throws IOException, SQLException {
+    void buildDATAMap(String id_analyse) throws IOException, SQLException {
+        List<String> nodes = new ArrayList<>();
+        List<String> hostnames = new ArrayList<>();
+
+        List<String> routes = new ArrayList<>();
+        List<Integer> sizes = new ArrayList<>();
+
+        ResultSet qhosts = DB.query("SELECT * FROM host WHERE id_analyse='" + id_analyse + "'");
+        while (qhosts.next()) {
+            if (!nodes.contains(qhosts.getString("ip"))) {
+                nodes.add(qhosts.getString("ip"));
+                hostnames.add(qhosts.getString("hostname"));
+            }
+        }
+
+        ResultSet qroutes = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
+
+        while (qroutes.next()) {
+            if (!nodes.contains(qroutes.getString("from"))) {
+                nodes.add(qroutes.getString("from"));
+                hostnames.add(qhosts.getString("from"));
+            }
+            if (!nodes.contains(qroutes.getString("to"))) {
+                nodes.add(qroutes.getString("to"));
+                hostnames.add(qhosts.getString("to"));
+            }
+
+            int source = nodes.indexOf(qroutes.getString("from"));
+            int target = nodes.indexOf(qroutes.getString("to"));
+
+            if (!routes.contains(source + "-" + target) && !routes.contains(target + "-" + source)) {
+                routes.add(source + "-" + target);
+                sizes.add(1);
+            } else {
+                int route = (routes.indexOf(target + "-" + source) == -1) ? routes.indexOf(source + "-" + target) : routes.indexOf(target + "-" + source);
+                sizes.set(route, sizes.get(route) + 1);
+            }
+        }
+        for (int i = 0; i < routes.size(); i++) {
+            Integer size = sizes.get(i);
+            String route = routes.get(i);
+            System.out.println(" route : " + nodes.get(Integer.parseInt(route.split("-")[0])) + " - " + nodes.get(Integer.parseInt(route.split("-")[1])) + " / " + size);
+        }
+        buildXMLMap(nodes, hostnames, routes, sizes);
+    }
+
+    void buildXMLMap(List<String> nodes, List<String> hostnames, List<String> routes, List<Integer> sizes) throws IOException, SQLException {
+
         File file = new File("data/map.xml");
         if (file.exists()) {
             file.delete();
@@ -756,7 +804,6 @@ public class UIFrameHome extends javax.swing.JFrame {
         file.createNewFile();
 
         FileWriter writer = new FileWriter(file);
-
         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<!--  Data for visualitation of a network  -->\n"
                 + "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\">\n"
@@ -765,73 +812,118 @@ public class UIFrameHome extends javax.swing.JFrame {
                 + "<!-- data schema -->\n"
                 + "<key id=\"ip\" for=\"node\" attr.name=\"ip\" attr.type=\"string\"/>\n"
                 + "<key id=\"hostname\" for=\"node\" attr.name=\"hostname\" attr.type=\"string\"/>\n"
-           //     + "<key id=\"at\" for=\"node\" attr.name=\"at\" attr.type=\"DateTime\"/>\n"
+                //     + "<key id=\"at\" for=\"node\" attr.name=\"at\" attr.type=\"DateTime\"/>\n"
                 + ""
                 + "<key id=\"size\" for=\"edge\" attr.name=\"size\" attr.type=\"Double\"/>\n"
                 + "\n\n");
-        ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse='" + id_analyse + "'");
-        List<String> nodes = new ArrayList<>();
-        while (host.next()) {
-            //TODO optimize to add info if note existing
-             if (!nodes.contains(host.getString("ip"))) {
-                nodes.add(host.getString("ip"));
-                writer.write("<node id=\"" + nodes.size() + "\">\n"
-                        + " <data key=\"ip\">" + host.getString("ip") + "</data>\n"
-                        + " <data key=\"hostname\">" + host.getString("hostname") + "</data>\n"
-             //           + " <data key=\"tcp\">" + host.getString("tcp") + "</data>\n"
-             //           + " <data key=\"udp\">" + host.getString("udp") + "</data>\n"
-             //           + " <data key=\"at\">" + host.getString("at") + "</data>\n"
-                        + " </node>\n");
-            }
-        }
-        ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
-        //List<String> nodes = new ArrayList<>();
-        List<String> trajets = new ArrayList<>();
-        while (route.next()) {
-            int source = 0;
-            int target = 0;
-            if (!nodes.contains(route.getString("from"))) {
-                nodes.add(route.getString("from"));
-                writer.write("<node id=\"" + nodes.size() + "\">\n"
-                        + " <data key=\"ip\">" + route.getString("from") + "</data>\n"
-                //        + " <data key=\"at\">" + route.getString("at") + "</data>\n"
-                        + " <data key=\"hostname\">" + route.getString("from") + "</data>\n"
-                        + " </node>\n");
-                source = nodes.size();
-            } else {
-                source = nodes.indexOf(route.getString("from")) + 1;
-            }
 
-            if (!nodes.contains(route.getString("to"))) {
-                nodes.add(route.getString("to"));
-                writer.write("<node id=\"" + nodes.size() + "\">\n"
-                        + " <data key=\"ip\">" + route.getString("to") + "</data>\n"
-             //           + " <data key=\"at\">" + route.getString("at") + "</data>\n"
-                        + " <data key=\"hostname\">" + route.getString("to") + "</data>\n"
-                        + " </node>\n");
-                target = nodes.size();
-            } else {
-                target = nodes.indexOf(route.getString("to")) + 1;
-            }
-
-            if (!trajets.contains(source + "->" + target)) {
-                trajets.add(source + "->" + target);
-                //TODO determine size
-                int count = (new DB()).count("SELECT * FROM route WHERE `from`='\" + source + \"' AND `to`='\" + target + \"';");
-                System.out.println("count : "+count);
-               // Array f = route.getArray("from");
-               // Array t = route.getArray("to");
-                writer.write("\n<edge source=\"" + source + "\" target=\"" + target + "\">"
-                       // + " <data key=\"size\">" + DB.count("SELECT * FROM route WHERE `from`='" + source + "' AND `to`='" + target + "';") + "</data>\n"
-                        + " <data key=\"size\">" + 5 + "</data>\n"
-                        + "</edge>\n");
-            }
+        for (int i = 0; i < nodes.size(); i++) {
+            writer.write("<node id=\"" + i + "\">\n"
+                    + " <data key=\"ip\">" + nodes.get(i) + "</data>\n"
+                    + " <data key=\"hostname\">" + hostnames.get(i) + "</data>\n"
+                    //           + " <data key=\"tcp\">" + host.getString("tcp") + "</data>\n"
+                    //           + " <data key=\"udp\">" + host.getString("udp") + "</data>\n"
+                    //           + " <data key=\"at\">" + host.getString("at") + "</data>\n"
+                    + " </node>\n");
         }
 
+        for (int i = 0; i < routes.size(); i++) {
+            writer.write("\n<edge source=\"" + routes.get(i).split("-")[0] + "\" target=\"" + routes.get(i).split("-")[1]  + "\">"
+                    // + " <data key=\"size\">" + DB.count("SELECT * FROM route WHERE `from`='" + source + "' AND `to`='" + target + "';") + "</data>\n"
+                    + " <data key=\"size\">" + sizes.get(i) + "</data>\n"
+                    + "</edge>\n");
+        }
         writer.write("\n\n"
                 + "</graph>\n"
                 + "</graphml>");
         writer.flush();
+//Work in progress : separating getting and preparing data to build the xml map
+        /*
+         buildDATAMap(id_analyse);
+         File file = new File("data/map.xml");
+         if (file.exists()) {
+         file.delete();
+         }
+         file.createNewFile();
+
+         FileWriter writer = new FileWriter(file);
+
+         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+         + "<!--  Data for visualitation of a network  -->\n"
+         + "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\">\n"
+         + "<graph edgedefault=\"undirected\">\n"
+         + " \n"
+         + "<!-- data schema -->\n"
+         + "<key id=\"ip\" for=\"node\" attr.name=\"ip\" attr.type=\"string\"/>\n"
+         + "<key id=\"hostname\" for=\"node\" attr.name=\"hostname\" attr.type=\"string\"/>\n"
+         //     + "<key id=\"at\" for=\"node\" attr.name=\"at\" attr.type=\"DateTime\"/>\n"
+         + ""
+         + "<key id=\"size\" for=\"edge\" attr.name=\"size\" attr.type=\"Double\"/>\n"
+         + "\n\n");
+         ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse='" + id_analyse + "'");
+         List<String> nodes = new ArrayList<>();
+         while (host.next()) {
+         //TODO optimize to add info if note existing
+         if (!nodes.contains(host.getString("ip"))) {
+         nodes.add(host.getString("ip"));
+         writer.write("<node id=\"" + nodes.size() + "\">\n"
+         + " <data key=\"ip\">" + host.getString("ip") + "</data>\n"
+         + " <data key=\"hostname\">" + host.getString("hostname") + "</data>\n"
+         //           + " <data key=\"tcp\">" + host.getString("tcp") + "</data>\n"
+         //           + " <data key=\"udp\">" + host.getString("udp") + "</data>\n"
+         //           + " <data key=\"at\">" + host.getString("at") + "</data>\n"
+         + " </node>\n");
+         }
+         }
+         ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
+
+         List<String> trajets = new ArrayList<>();
+         while (route.next()) {
+         int source, target;
+
+         if (!nodes.contains(route.getString("from"))) {
+         nodes.add(route.getString("from"));
+         writer.write("<node id=\"" + nodes.size() + "\">\n"
+         + " <data key=\"ip\">" + route.getString("from") + "</data>\n"
+         //        + " <data key=\"at\">" + route.getString("at") + "</data>\n"
+         + " <data key=\"hostname\">" + route.getString("from") + "</data>\n"
+         + " </node>\n");
+         source = nodes.size();
+         } else {
+         source = nodes.indexOf(route.getString("from")) + 1;
+         }
+
+         if (!nodes.contains(route.getString("to"))) {
+         nodes.add(route.getString("to"));
+         writer.write("<node id=\"" + nodes.size() + "\">\n"
+         + " <data key=\"ip\">" + route.getString("to") + "</data>\n"
+         //           + " <data key=\"at\">" + route.getString("at") + "</data>\n"
+         + " <data key=\"hostname\">" + route.getString("to") + "</data>\n"
+         + " </node>\n");
+         target = nodes.size();
+         } else {
+         target = nodes.indexOf(route.getString("to")) + 1;
+         }
+
+         if (!trajets.contains(source + "->" + target)) {
+         trajets.add(source + "->" + target);
+         //TODO determine size
+         //int count = (new DB()).count("SELECT * FROM route WHERE `from`='\" + source + \"' AND `to`='\" + target + \"';");
+         //System.out.println("count : " + count);
+         // Array f = route.getArray("from");
+         // Array t = route.getArray("to");
+         writer.write("\n<edge source=\"" + source + "\" target=\"" + target + "\">"
+         // + " <data key=\"size\">" + DB.count("SELECT * FROM route WHERE `from`='" + source + "' AND `to`='" + target + "';") + "</data>\n"
+         + " <data key=\"size\">" + 5 + "</data>\n"
+         + "</edge>\n");
+         }
+         }
+
+         writer.write("\n\n"
+         + "</graph>\n"
+         + "</graphml>");
+         writer.flush();
+         */
     }
 
     void setAll(boolean state) {

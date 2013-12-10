@@ -41,9 +41,9 @@ import java.util.logging.Logger;
 public class Analyse extends Thread {
 
     private static String name;
-    protected static String state = "Not initialized";
-    protected static long request_done = 0;
-    protected static long request_total = 0;
+    protected String state = "Not initialized";
+    protected long request_done = 0;
+    protected long request_total = 0;
     private static long timestamp;
     private static String target;
     private static String port;
@@ -55,6 +55,7 @@ public class Analyse extends Thread {
     private final double timeout_trace = 0.3;
 
     public Analyse(String[] params) {
+
         System.out.println("Init analyse");
 
         for (String s : params) {
@@ -198,7 +199,7 @@ public class Analyse extends Thread {
         System.out.println("local ip : " + local_ip);
         String host_ip = null;
         for (String line : tracert.split("\n")) {
-            if ((line.startsWith("  " + i) || line.startsWith(" " + i) || line.startsWith("" + i)) && !line.endsWith("!X")) {
+            if ( ( (line.startsWith("  " + i) || line.startsWith(" " + i) || line.startsWith("" + i)) && !line.endsWith("!X") ) && !line.contains("no reply") )  {
                 //System.out.println(line.lastIndexOf("  "));
                 //System.out.println(line.split("  "));
                 String host;
@@ -212,7 +213,8 @@ public class Analyse extends Thread {
                     System.out.println("ip :" + previous_ip + ">" + host);
                     host_ip = host;
                 } else if (Tool.is_hostname(host.split(" ")[0])) {
-                    host_ip = host.split(" ")[1].substring(1, host.split(" ")[1].length() - 2);
+                    //TODO check on all system (Archlinxu ok !)
+                    host_ip = host.split(" ")[1].substring(1, host.split(" ")[1].length() - 1);
                     System.out.println("hostname :" + previous_ip + ">" + host);
                 }
 
@@ -237,7 +239,7 @@ public class Analyse extends Thread {
         }
     }
 
-    private String traceroute(String ip) {
+    private String traceroute(String ip) throws InterruptedException {
         //TODO
         String route = "";
         try {
@@ -247,9 +249,22 @@ public class Analyse extends Thread {
                 //route += "win\n";
                 traceRt = Runtime.getRuntime().exec("tracert -w " + (int) (timeout_trace * 1000) + " " + ((checkdns == "false") ? "-d" : "") + " " + ip);
             } else {
-                System.out.println("traceroute -w " + timeout_trace + " " + ((checkdns == "false") ? "-n" : "") + " " + ip);
-                //route += "unix\n";
-                traceRt = Runtime.getRuntime().exec("traceroute -w " + timeout_trace + " " + ((checkdns == "false") ? "-n" : "") + " " + ip);
+                //TODO optimize to only verify one time
+                Process t = Runtime.getRuntime().exec("which traceroute");
+                t.waitFor();
+                System.out.println(""+t.exitValue());
+                if (t.exitValue()==0) {
+                    System.out.println("traceroute -w " + timeout_trace + " " + ((checkdns == "false") ? "-n" : "") + " " + ip);
+                    //route += "unix\n";
+                    traceRt = Runtime.getRuntime().exec("traceroute -w " + timeout_trace + " " + ((checkdns == "false") ? "-n" : "") + " " + ip);
+
+                } else {
+                    //TODO optimize for tracepath utility
+                    System.out.println("tracepath -n " + ip);
+                    //route += "unix\n";
+                    traceRt = Runtime.getRuntime().exec("tracepath -n "+ ip);
+
+                }
             }
             BufferedReader buff = new BufferedReader(new InputStreamReader(traceRt.getInputStream()));
 
@@ -302,7 +317,11 @@ public class Analyse extends Thread {
 
                     @Override
                     public void run() {
-                        parse_traceroute(traceroute(ip), ip);
+                        try {
+                            parse_traceroute(traceroute(ip), ip);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 });
 
