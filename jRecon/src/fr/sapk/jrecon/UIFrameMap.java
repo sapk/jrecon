@@ -22,7 +22,6 @@ import prefuse.Visualization;
 import prefuse.action.ActionList;
 import prefuse.action.RepaintAction;
 import prefuse.action.assignment.ColorAction;
-import prefuse.action.assignment.DataColorAction;
 import prefuse.action.assignment.DataSizeAction;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
@@ -35,7 +34,6 @@ import prefuse.data.io.GraphMLReader;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
-import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
 
 
@@ -55,7 +53,7 @@ public class UIFrameMap implements Runnable {
         try {
             graph = new GraphMLReader().readGraph(file);
         } catch (DataIOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.err.println("Error loading graph. Exiting...");
             //System.exit(1);
             this.finalize();
@@ -76,7 +74,7 @@ public class UIFrameMap implements Runnable {
 
         DataSizeAction sizeAction = new DataSizeAction("graph.edges","size");
         //TODO tweak this avlue for beautiful vis
-        sizeAction.setMinimumSize(15);
+        sizeAction.setMinimumSize(5);
        
         //sizeAction.setBinCount(500);
         // sizeAction.getScale();

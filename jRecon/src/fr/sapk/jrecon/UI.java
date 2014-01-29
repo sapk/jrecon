@@ -37,6 +37,7 @@ public class UI extends Thread {
 
         f = new UIFrameHome();
         f.setVisible(true);
+        /* TODO presentation */
         f.ButtonGO.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {

@@ -461,29 +461,30 @@ public class UIFrameHome extends javax.swing.JFrame {
             String id = analyse.getString("id_analyse");
             //query.
             File file;
-            do{
-            JFileChooser choix = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter(
-            "jRecon File", "jrc");
-            choix.setFileFilter(filter);
-            choix.removeChoosableFileFilter(choix.getAcceptAllFileFilter());
-            int retour = choix.showOpenDialog(this);
-            if (retour == JFileChooser.APPROVE_OPTION) {
-                System.out.println(choix.getSelectedFile().getAbsolutePath());
-                file = choix.getSelectedFile();
-                System.out.println(file.getName());
-                if(!(file.getName().endsWith("jrc")))
-                    file = new File(choix.getSelectedFile().getAbsolutePath() + ".jrc");
-            }else{
-                System.out.println("Aucun fichier selectionné");
-                return;
-            }
-            //File file = new File("data/export/export-" + URLEncoder.encode(analyse.getString("name").split("#")[0]) + "-" + analyse.getString("timestamp") + ".sql");
+            do {
+                JFileChooser choix = new JFileChooser();
+                FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                        "jRecon File", "jrc");
+                choix.setFileFilter(filter);
+                choix.removeChoosableFileFilter(choix.getAcceptAllFileFilter());
+                int retour = choix.showOpenDialog(this);
+                if (retour == JFileChooser.APPROVE_OPTION) {
+                    System.out.println(choix.getSelectedFile().getAbsolutePath());
+                    file = choix.getSelectedFile();
+                    System.out.println(file.getName());
+                    if (!(file.getName().endsWith("jrc"))) {
+                        file = new File(choix.getSelectedFile().getAbsolutePath() + ".jrc");
+                    }
+                } else {
+                    System.out.println("Aucun fichier selectionné");
+                    return;
+                }
+                //File file = new File("data/export/export-" + URLEncoder.encode(analyse.getString("name").split("#")[0]) + "-" + analyse.getString("timestamp") + ".sql");
                 if (file.exists()) {
                     System.out.println("Fichier déjà existant");
                 }
-            } while(file.exists());
-                    
+            } while (file.exists());
+
             System.out.println(file.getAbsolutePath());
             file.createNewFile();
             try (FileWriter writer = new FileWriter(file)) {
@@ -569,7 +570,7 @@ public class UIFrameHome extends javax.swing.JFrame {
         //TODO show selection box import data
         JFileChooser choix = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-        "jRecon File", "jrc");
+                "jRecon File", "jrc");
         choix.setFileFilter(filter);
         choix.removeChoosableFileFilter(choix.getAcceptAllFileFilter());
         int retour = choix.showOpenDialog(this);
@@ -749,6 +750,11 @@ public class UIFrameHome extends javax.swing.JFrame {
     }
 
     void buildXMLMap(String id_analyse) throws IOException, SQLException {
+        ArrayList[] data = Tool.getData(id_analyse);
+        String xml = Tool.buildXML(data[0], data[1]);
+        Tool.writetoFile("data/map.xml", xml);
+        //System.out.println(((String[]) a[1].get(0))[1]);
+        /*
         File file = new File("data/map.xml");
         if (file.exists()) {
             file.delete();
@@ -765,7 +771,7 @@ public class UIFrameHome extends javax.swing.JFrame {
                 + "<!-- data schema -->\n"
                 + "<key id=\"ip\" for=\"node\" attr.name=\"ip\" attr.type=\"string\"/>\n"
                 + "<key id=\"hostname\" for=\"node\" attr.name=\"hostname\" attr.type=\"string\"/>\n"
-           //     + "<key id=\"at\" for=\"node\" attr.name=\"at\" attr.type=\"DateTime\"/>\n"
+                //     + "<key id=\"at\" for=\"node\" attr.name=\"at\" attr.type=\"DateTime\"/>\n"
                 + ""
                 + "<key id=\"size\" for=\"edge\" attr.name=\"size\" attr.type=\"Double\"/>\n"
                 + "\n\n");
@@ -773,14 +779,14 @@ public class UIFrameHome extends javax.swing.JFrame {
         List<String> nodes = new ArrayList<>();
         while (host.next()) {
             //TODO optimize to add info if note existing
-             if (!nodes.contains(host.getString("ip"))) {
+            if (!nodes.contains(host.getString("ip"))) {
                 nodes.add(host.getString("ip"));
                 writer.write("<node id=\"" + nodes.size() + "\">\n"
                         + " <data key=\"ip\">" + host.getString("ip") + "</data>\n"
                         + " <data key=\"hostname\">" + host.getString("hostname") + "</data>\n"
-             //           + " <data key=\"tcp\">" + host.getString("tcp") + "</data>\n"
-             //           + " <data key=\"udp\">" + host.getString("udp") + "</data>\n"
-             //           + " <data key=\"at\">" + host.getString("at") + "</data>\n"
+                        //           + " <data key=\"tcp\">" + host.getString("tcp") + "</data>\n"
+                        //           + " <data key=\"udp\">" + host.getString("udp") + "</data>\n"
+                        //           + " <data key=\"at\">" + host.getString("at") + "</data>\n"
                         + " </node>\n");
             }
         }
@@ -794,7 +800,7 @@ public class UIFrameHome extends javax.swing.JFrame {
                 nodes.add(route.getString("from"));
                 writer.write("<node id=\"" + nodes.size() + "\">\n"
                         + " <data key=\"ip\">" + route.getString("from") + "</data>\n"
-                //        + " <data key=\"at\">" + route.getString("at") + "</data>\n"
+                        //        + " <data key=\"at\">" + route.getString("at") + "</data>\n"
                         + " <data key=\"hostname\">" + route.getString("from") + "</data>\n"
                         + " </node>\n");
                 source = nodes.size();
@@ -806,7 +812,7 @@ public class UIFrameHome extends javax.swing.JFrame {
                 nodes.add(route.getString("to"));
                 writer.write("<node id=\"" + nodes.size() + "\">\n"
                         + " <data key=\"ip\">" + route.getString("to") + "</data>\n"
-             //           + " <data key=\"at\">" + route.getString("at") + "</data>\n"
+                        //           + " <data key=\"at\">" + route.getString("at") + "</data>\n"
                         + " <data key=\"hostname\">" + route.getString("to") + "</data>\n"
                         + " </node>\n");
                 target = nodes.size();
@@ -817,12 +823,18 @@ public class UIFrameHome extends javax.swing.JFrame {
             if (!trajets.contains(source + "->" + target)) {
                 trajets.add(source + "->" + target);
                 //TODO determine size
-                int count = (new DB()).count("SELECT * FROM route WHERE `from`='\" + source + \"' AND `to`='\" + target + \"';");
-                System.out.println("count : "+count);
-               // Array f = route.getArray("from");
-               // Array t = route.getArray("to");
+                int count = 1;
+//                System.out.println("SELECT COUNT(*) FROM route WHERE from=" + source + " AND to=" + target + "");
+            //    System.out.println("SELECT COUNT(*) FROM route");
+            //    ResultSet c = DB.query("SELECT COUNT(*) FROM route");
+            //    c.next();
+            //    count = c.getInt(1);
+
+                System.out.println("count : " + count);
+                // Array f = route.getArray("from");
+                // Array t = route.getArray("to");
                 writer.write("\n<edge source=\"" + source + "\" target=\"" + target + "\">"
-                       // + " <data key=\"size\">" + DB.count("SELECT * FROM route WHERE `from`='" + source + "' AND `to`='" + target + "';") + "</data>\n"
+                        //  + " <data key=\"size\">" + DB.count("SELECT * FROM route WHERE `from`='" + source + "' AND `to`='" + target + "';") + "</data>\n"
                         + " <data key=\"size\">" + 5 + "</data>\n"
                         + "</edge>\n");
             }
@@ -832,6 +844,7 @@ public class UIFrameHome extends javax.swing.JFrame {
                 + "</graph>\n"
                 + "</graphml>");
         writer.flush();
+        */
     }
 
     void setAll(boolean state) {
