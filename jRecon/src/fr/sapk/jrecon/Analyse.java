@@ -52,7 +52,7 @@ public class Analyse extends Thread {
     private static String local_ip = null;
     private static int id;
 
-    private final double timeout_trace = 0.5;
+    private final double timeout_trace = 0.75;
 
     public Analyse(String[] params) {
         System.out.println("Init analyse");
@@ -212,7 +212,13 @@ public class Analyse extends Thread {
                     System.out.println("ip :" + previous_ip + ">" + host);
                     host_ip = host;
                 } else if (Tool.is_hostname(host.split(" ")[0])) {
-                    host_ip = host.split(" ")[1].substring(1, host.split(" ")[1].length() - 2);
+                    host_ip = host.split(" ")[1].substring(1, host.split(" ")[1].length() - 1);
+                    try {
+                        DB.addQueue("INSERT OR REPLACE INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + host_ip + "', '" + host.split(" ")[0] + "', '[]', '[]', '" + System.currentTimeMillis() + "') ");
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
                     System.out.println("hostname :" + previous_ip + ">" + host);
                 }
 

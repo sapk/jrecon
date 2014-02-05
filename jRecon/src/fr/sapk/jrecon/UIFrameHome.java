@@ -635,7 +635,7 @@ public class UIFrameHome extends javax.swing.JFrame {
 
             //System.out.println(multi);
             //request étati multiplié par 10 pour les traceroute (moyenne)
-            requests = 10 * requests + (requests) * multi;
+            requests = 750 * requests + (requests) * multi;
 
             if (CheckBoxLimit.isSelected() && InputLimit.getText().length() > 0 && Double.parseDouble(InputLimit.getText()) > 0) {
                 multi = 1 / (Double.parseDouble(InputLimit.getText()));
