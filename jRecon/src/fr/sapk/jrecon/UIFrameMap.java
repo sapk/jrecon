@@ -33,8 +33,11 @@ import prefuse.action.layout.graph.RadialTreeLayout;
 import prefuse.activity.Activity;
 import prefuse.activity.SlowInSlowOutPacer;
 import prefuse.controls.DragControl;
+import prefuse.controls.FocusControl;
 import prefuse.controls.HoverActionControl;
+import prefuse.controls.NeighborHighlightControl;
 import prefuse.controls.PanControl;
+import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
 import prefuse.controls.ZoomToFitControl;
 import prefuse.data.Graph;
@@ -81,8 +84,9 @@ public class UIFrameMap implements Runnable {
         ColorAction edges = new ColorAction("graph.edges", VisualItem.STROKECOLOR, ColorLib.gray(200));
 
         fill.add("_hover", ColorLib.rgb(240, 160, 160));
+        fill.add("_highlight", ColorLib.rgb(255, 200, 125));
+        edges.add("_highlight", ColorLib.rgb(255, 230, 155));
 //DataColorAction edges = new DataColorAction("graph.edges",;
-
         DataSizeAction sizeAction = new DataSizeAction("graph.edges", "size");
         //TODO tweak this avlue for beautiful vis
         sizeAction.setMinimumSize(5);
@@ -92,28 +96,26 @@ public class UIFrameMap implements Runnable {
         ActionList color = new ActionList();
 //        color.add(fill);
         color.add(text);
-        color.add(edges);
+//        color.add(edges);
         color.add(sizeAction);
 
         ActionList hover = new ActionList();
         hover.add(fill);
-
+        hover.add(edges);
         //TODO 37.187.4.165
         // create an action list with an animated layout
         // the INFINITY parameter tells the action list to run indefinitely
         //
         //RadialTreeLayout treeLayout = new RadialTreeLayout("graph");
         //vis.putAction("treeLayout", treeLayout);
-
         ActionList layout = new ActionList(Activity.INFINITY, Activity.DEFAULT_STEP_TIME);
         //ActionList layout = new ActionList(1000,Activity.DEFAULT_STEP_TIME);;
 
-        
         ForceDirectedLayout fdl = new ForceDirectedLayout("graph");
         ForceSimulator fsim = fdl.getForceSimulator();
         fsim.getForces()[0].setParameter(0, -4.2f);
         layout.add(fdl);
-        
+
         //layout.add(new ForceDirectedLayout("graph",true));
         //layout.add(new ForceDirectedLayout("graph", false));
         //RadialTreeLayout treeL = new RadialTreeLayout("graph");
@@ -121,13 +123,13 @@ public class UIFrameMap implements Runnable {
         //layout.add(treeL);
         //layout.add( new CollapsedSubtreeLayout("graph"));
         /*
-        layout.setPacingFunction(new SlowInSlowOutPacer());
-        layout.add(new QualityControlAnimator());
-        layout.add(new VisibilityAnimator("graph"));
-        layout.add(new PolarLocationAnimator("graph.nodes", "linear"));
-        //layout.add(new ForceDirectedLayout("graph", false));
-        //layout.add(new ColorAnimator("graph.nodes"));
-*/
+         layout.setPacingFunction(new SlowInSlowOutPacer());
+         layout.add(new QualityControlAnimator());
+         layout.add(new VisibilityAnimator("graph"));
+         layout.add(new PolarLocationAnimator("graph.nodes", "linear"));
+         //layout.add(new ForceDirectedLayout("graph", false));
+         //layout.add(new ColorAnimator("graph.nodes"));
+         */
         layout.add(new RepaintAction());
 
         /*
@@ -162,6 +164,9 @@ public class UIFrameMap implements Runnable {
         display.addControlListener(new ZoomControl()); // zoom with vertical right-drag
         display.addControlListener(new ZoomToFitControl()); //auto-zoom on right click with no dragging
         display.addControlListener(new HoverActionControl("hover"));
+        display.addControlListener(new WheelZoomControl());
+        display.addControlListener(new FocusControl(1));
+        display.addControlListener(new NeighborHighlightControl());
 
         // create a new window to hold the visualization
         JFrame frame = new JFrame("Map");
