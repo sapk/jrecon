@@ -45,6 +45,7 @@ import prefuse.controls.FocusControl;
 import prefuse.controls.HoverActionControl;
 import prefuse.controls.NeighborHighlightControl;
 import prefuse.controls.PanControl;
+import prefuse.controls.ToolTipControl;
 import prefuse.controls.WheelZoomControl;
 import prefuse.controls.ZoomControl;
 import prefuse.controls.ZoomToFitControl;
@@ -176,8 +177,9 @@ public class UIFrameMap implements Runnable {
         display.addControlListener(new ZoomToFitControl()); //auto-zoom on right click with no dragging
         display.addControlListener(new HoverActionControl("hover"));
         display.addControlListener(new WheelZoomControl());
-        display.addControlListener(new FocusControl(1));
+        display.addControlListener(new FocusControl(1)); //TODO
         display.addControlListener(new NeighborHighlightControl());
+        display.addControlListener(new ToolTipControl("hostname"));
 
         vis.run("color");  // assign the colors
         vis.run("hover"); // start up the animated layout
