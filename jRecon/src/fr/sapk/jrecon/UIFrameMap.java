@@ -16,7 +16,14 @@
  */
 package fr.sapk.jrecon;
 
+import java.awt.Color;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import prefuse.Display;
 import prefuse.Visualization;
 import prefuse.action.ActionList;
@@ -27,6 +34,7 @@ import prefuse.action.animate.QualityControlAnimator;
 import prefuse.action.animate.VisibilityAnimator;
 import prefuse.action.assignment.ColorAction;
 import prefuse.action.assignment.DataSizeAction;
+import prefuse.action.filter.GraphDistanceFilter;
 import prefuse.action.layout.CollapsedSubtreeLayout;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.action.layout.graph.RadialTreeLayout;
@@ -47,6 +55,7 @@ import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.force.ForceSimulator;
+import prefuse.util.ui.JForcePanel;
 import prefuse.visual.VisualItem;
 
 /**
@@ -79,6 +88,7 @@ public class UIFrameMap implements Runnable {
 
         vis.setRendererFactory(new DefaultRendererFactory(r));
 
+        //final GraphDistanceFilter filter = new GraphDistanceFilter("graph", 4);
         ColorAction fill = new ColorAction("graph.nodes", VisualItem.FILLCOLOR, ColorLib.rgb(160, 240, 160));
         ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR, ColorLib.gray(0));
         ColorAction edges = new ColorAction("graph.edges", VisualItem.STROKECOLOR, ColorLib.gray(200));
@@ -95,6 +105,7 @@ public class UIFrameMap implements Runnable {
         // sizeAction.getScale();
         ActionList color = new ActionList();
 //        color.add(fill);
+        //color.add(filter);
         color.add(text);
 //        color.add(edges);
         color.add(sizeAction);
@@ -168,18 +179,36 @@ public class UIFrameMap implements Runnable {
         display.addControlListener(new FocusControl(1));
         display.addControlListener(new NeighborHighlightControl());
 
+        vis.run("color");  // assign the colors
+        vis.run("hover"); // start up the animated layout
+        vis.run("layout"); // start up the animated layout
+
+        JPanel panel = new JPanel();
+        panel.setBackground(ColorLib.getColor(100, 100, 100, (float)0.5) );
+        JFormattedTextField textfield = new JFormattedTextField("no data");
+        textfield.setBackground(ColorLib.getColor(100, 100, 100, (float)0.5) );
+        textfield.setEditable(false);
+        textfield.setLocation(0, 0);
+        panel.add(textfield);
+        // create a new JSplitPane to present the interface
+        JSplitPane split = new JSplitPane();
+        split.setLeftComponent(display);
+        split.setRightComponent(panel);
+        split.setOneTouchExpandable(true);
+        split.setContinuousLayout(false);
+        split.setDividerLocation(580);
+        //split.setDividerLocation(800);
+        textfield.setSize(panel.getSize());
+
+        
         // create a new window to hold the visualization
         JFrame frame = new JFrame("Map");
         frame.setIconImage(Tool.loadImageIcon("/img/icon.png").getImage());
         // ensure application exits when window is closed
         // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(display);
+        frame.add(split);
         frame.pack();           // layout components in window
         frame.setVisible(true); // show the window
-
-        vis.run("color");  // assign the colors
-        vis.run("hover"); // start up the animated layout
-        vis.run("layout"); // start up the animated layout
         System.out.println("Map visualitation ready !");
     }
 
