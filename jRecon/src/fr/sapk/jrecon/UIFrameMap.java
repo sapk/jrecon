@@ -16,10 +16,6 @@
  */
 package fr.sapk.jrecon;
 
-import java.awt.Color;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -28,16 +24,10 @@ import prefuse.Display;
 import prefuse.Visualization;
 import prefuse.action.ActionList;
 import prefuse.action.RepaintAction;
-import prefuse.action.animate.ColorAnimator;
 import prefuse.action.animate.PolarLocationAnimator;
-import prefuse.action.animate.QualityControlAnimator;
-import prefuse.action.animate.VisibilityAnimator;
 import prefuse.action.assignment.ColorAction;
 import prefuse.action.assignment.DataSizeAction;
-import prefuse.action.filter.GraphDistanceFilter;
-import prefuse.action.layout.CollapsedSubtreeLayout;
 import prefuse.action.layout.graph.ForceDirectedLayout;
-import prefuse.action.layout.graph.RadialTreeLayout;
 import prefuse.activity.Activity;
 import prefuse.activity.SlowInSlowOutPacer;
 import prefuse.controls.DragControl;
@@ -56,7 +46,6 @@ import prefuse.render.DefaultRendererFactory;
 import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.force.ForceSimulator;
-import prefuse.util.ui.JForcePanel;
 import prefuse.visual.VisualItem;
 
 /**
@@ -92,15 +81,20 @@ public class UIFrameMap implements Runnable {
         //final GraphDistanceFilter filter = new GraphDistanceFilter("graph", 4);
         ColorAction fill = new ColorAction("graph.nodes", VisualItem.FILLCOLOR, ColorLib.rgb(160, 240, 160));
         ColorAction text = new ColorAction("graph.nodes", VisualItem.TEXTCOLOR, ColorLib.gray(0));
+        //ColorAction shape = new ColorAction("graph.nodes", VisualItem.SHAPE, ColorLib.gray(0));
+
         ColorAction edges = new ColorAction("graph.edges", VisualItem.STROKECOLOR, ColorLib.gray(200));
 
+//        fill.add(VisualItem.FIXED, ColorLib.rgb(20, 16, 16));
         fill.add("_hover", ColorLib.rgb(240, 160, 160));
         fill.add("_highlight", ColorLib.rgb(255, 200, 125));
         edges.add("_highlight", ColorLib.rgb(255, 230, 155));
 //DataColorAction edges = new DataColorAction("graph.edges",;
-        DataSizeAction sizeAction = new DataSizeAction("graph.edges", "size");
+        DataSizeAction sizenodeAction = new DataSizeAction("graph.nodes", "size");
+
+        DataSizeAction sizeedgeAction = new DataSizeAction("graph.edges", "size");
         //TODO tweak this avlue for beautiful vis
-        sizeAction.setMinimumSize(5);
+        sizeedgeAction.setMinimumSize(5);
 
         //sizeAction.setBinCount(500);
         // sizeAction.getScale();
@@ -109,7 +103,8 @@ public class UIFrameMap implements Runnable {
         //color.add(filter);
         color.add(text);
 //        color.add(edges);
-        color.add(sizeAction);
+        color.add(sizeedgeAction);
+        color.add(sizenodeAction);
 
         ActionList hover = new ActionList();
         hover.add(fill);
@@ -125,8 +120,12 @@ public class UIFrameMap implements Runnable {
 
         ForceDirectedLayout fdl = new ForceDirectedLayout("graph");
         ForceSimulator fsim = fdl.getForceSimulator();
-        fsim.getForces()[0].setParameter(0, -4.2f);
+        fsim.getForces()[0].setParameter(0, -4f);
+//        fdl.setPacingFunction(new SlowInSlowOutPacer());
+        fsim.setSpeedLimit((float) 0.01);
+//        fsim.getSprings()[0].set
         layout.add(fdl);
+//        layout.setPacingFunction(new SlowInSlowOutPacer());
 
         //layout.add(new ForceDirectedLayout("graph",true));
         //layout.add(new ForceDirectedLayout("graph", false));
@@ -160,6 +159,8 @@ public class UIFrameMap implements Runnable {
         vis.putAction("color", color);
         vis.putAction("hover", hover);
         vis.putAction("layout", layout);
+        //vis.alwaysRunAfter("hover", "layout");
+        //
 
     }
 
@@ -186,9 +187,9 @@ public class UIFrameMap implements Runnable {
         vis.run("layout"); // start up the animated layout
 
         JPanel panel = new JPanel();
-        panel.setBackground(ColorLib.getColor(100, 100, 100, (float)0.5) );
+        panel.setBackground(ColorLib.getColor(100, 100, 100, (float) 0.5));
         JFormattedTextField textfield = new JFormattedTextField("no data");
-        textfield.setBackground(ColorLib.getColor(100, 100, 100, (float)0.5) );
+        textfield.setBackground(ColorLib.getColor(100, 100, 100, (float) 0.5));
         textfield.setEditable(false);
         textfield.setLocation(0, 0);
         panel.add(textfield);
@@ -198,11 +199,10 @@ public class UIFrameMap implements Runnable {
         split.setRightComponent(panel);
         split.setOneTouchExpandable(true);
         split.setContinuousLayout(false);
-        split.setDividerLocation(580);
-        //split.setDividerLocation(800);
+        //split.setDividerLocation(580);
+        split.setDividerLocation(0.8);
         textfield.setSize(panel.getSize());
 
-        
         // create a new window to hold the visualization
         JFrame frame = new JFrame("Map");
         frame.setIconImage(Tool.loadImageIcon("/img/icon.png").getImage());

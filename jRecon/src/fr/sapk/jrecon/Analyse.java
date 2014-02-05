@@ -52,7 +52,7 @@ public class Analyse extends Thread {
     private static String local_ip = null;
     private static int id;
 
-    private final double timeout_trace = 0.75;
+    private final double timeout_trace = 0.65;
 
     public Analyse(String[] params) {
         System.out.println("Init analyse");
@@ -141,16 +141,32 @@ public class Analyse extends Thread {
             long num_ip_broadcast = num_ip_reseau + num_network_size - 1;
 
             for (long i = num_ip_reseau; i <= num_ip_broadcast; i++) {
-                String ip = Tool.LongtoIPv4(i);
+                final String ip = Tool.LongtoIPv4(i);
                 //   System.out.println(ip);
                 String hostname = ip;
+                /*  pas besoin car le hostname est déterminé lors du traceroute.
+                    cette partie ralentissait fortement l'initialisation de la basse de donnée.
+                
                 if ("true".equals(checkdns)) {
-                    try {
-                        hostname = Tool.reverseDns(ip);
-                    } catch (UnknownHostException ex) {
-                        Logger.getLogger(Analyse.class.getName()).log(Level.WARNING, null, ex);
-                    }
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            String dns;
+                            try {
+                                dns = Tool.reverseDns(ip);
+                                DB.exec("UPDATE host SET hostname='" + dns + "' WHERE id_analyse=" + id + " AND ip='" + ip + "'");
+                            } catch (UnknownHostException ex) {
+                                Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (SQLException ex) {
+                                Logger.getLogger(Analyse.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+
+                        }
+                    }).start();
+
                 }
+                //*/
                 DB.addQueue("INSERT INTO host ('id_analyse', 'ip', 'hostname', 'tcp', 'udp', 'at') VALUES (" + id + ", '" + ip + "', '" + hostname + "', '[]', '[]', '" + timestamp + "') ");
 
             }

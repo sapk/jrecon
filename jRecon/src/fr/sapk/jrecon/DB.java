@@ -38,8 +38,8 @@ public class DB {
         check();
     }
 
-    private static String DBPath = "data/db.sqlite";
-    //private static String DBPath = ":memory:";
+    //private static String DBPath = "data/db.sqlite";
+    private static String DBPath = ":memory:";
 
     private static Connection connection = null;
     private static Statement statement = null;
@@ -73,12 +73,16 @@ public class DB {
     }
 
     static synchronized void addQueue(String sql) throws SQLException {
+        System.out.println("SQL :: "+sql);
         statement.addBatch(sql);
     }
 
     static synchronized void execQueue() throws SQLException {
+        System.out.println(System.currentTimeMillis()+" SQL Batch executing ...");
         statement.executeBatch();
+        System.out.println(System.currentTimeMillis()+" SQL Batch executed ...");
         connection.commit();
+        System.out.println(System.currentTimeMillis()+" SQL Batch commited ...");
     }
 
     private static void connect() {
