@@ -752,7 +752,7 @@ public class UIFrameHome extends javax.swing.JFrame {
     void buildXMLMap(String id_analyse) throws IOException, SQLException {
         ArrayList[] data = Tool.getData(id_analyse);
         String xml = Tool.buildXML(data[0], data[1]);
-        Tool.writetoFile("data/map.xml", xml);
+        Tool.writetoFile(JRecon.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/../data/map.xml", xml);
         //System.out.println(((String[]) a[1].get(0))[1]);
         /*
         File file = new File("data/map.xml");

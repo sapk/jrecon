@@ -24,12 +24,10 @@ import prefuse.Display;
 import prefuse.Visualization;
 import prefuse.action.ActionList;
 import prefuse.action.RepaintAction;
-import prefuse.action.animate.PolarLocationAnimator;
 import prefuse.action.assignment.ColorAction;
 import prefuse.action.assignment.DataSizeAction;
 import prefuse.action.layout.graph.ForceDirectedLayout;
 import prefuse.activity.Activity;
-import prefuse.activity.SlowInSlowOutPacer;
 import prefuse.controls.DragControl;
 import prefuse.controls.FocusControl;
 import prefuse.controls.HoverActionControl;
@@ -122,7 +120,7 @@ public class UIFrameMap implements Runnable {
         ForceSimulator fsim = fdl.getForceSimulator();
         fsim.getForces()[0].setParameter(0, -4f);
 //        fdl.setPacingFunction(new SlowInSlowOutPacer());
-        fsim.setSpeedLimit((float) 0.01);
+        fsim.setSpeedLimit((float) 0.05);
 //        fsim.getSprings()[0].set
         layout.add(fdl);
 //        layout.setPacingFunction(new SlowInSlowOutPacer());

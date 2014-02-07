@@ -17,6 +17,8 @@
 package fr.sapk.jrecon;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -38,13 +40,17 @@ public class DB {
         check();
     }
 
-    //private static String DBPath = "data/db.sqlite";
-    private static String DBPath = ":memory:";
+    private static String DBPath = JRecon.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/../data/db.sqlite";
+    //private static String DBPath = ":memory:";
 
     private static Connection connection = null;
     private static Statement statement = null;
 
     public DB() {
+        File p = new File(DBPath).getParentFile();
+        if (! p.isDirectory() ){
+            p.mkdir();
+        }
         if (connection == null || statement == null) {
             connect();
             check();
@@ -73,7 +79,7 @@ public class DB {
     }
 
     static synchronized void addQueue(String sql) throws SQLException {
-        System.out.println("SQL :: "+sql);
+        //System.out.println("SQL :: "+sql);
         statement.addBatch(sql);
     }
 

@@ -52,7 +52,7 @@ public class Analyse extends Thread {
     private static String local_ip = null;
     private static int id;
 
-    private final double timeout_trace = 0.65;
+    private final double timeout_trace = 0.75;
 
     public Analyse(String[] params) {
         System.out.println("Init analyse");
