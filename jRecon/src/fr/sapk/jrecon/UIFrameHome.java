@@ -476,8 +476,9 @@ public class UIFrameHome extends javax.swing.JFrame {
                 FileNameExtensionFilter filter = new FileNameExtensionFilter(
                         "jRecon File", "jrc");
                 choix.setFileFilter(filter);
+//                choix.setDialogType(JFileChooser.SAVE_DIALOG);
                 choix.removeChoosableFileFilter(choix.getAcceptAllFileFilter());
-                int retour = choix.showOpenDialog(this);
+                int retour = choix.showSaveDialog(this);
                 if (retour == JFileChooser.APPROVE_OPTION) {
                     System.out.println(choix.getSelectedFile().getAbsolutePath());
                     file = choix.getSelectedFile();
