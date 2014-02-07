@@ -25,6 +25,7 @@ import java.net.UnknownHostException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import javax.swing.ImageIcon;
 
 /**
@@ -158,21 +159,12 @@ public class Tool {
         return xml;
     }
 
-    public static ArrayList[] getData(String id_analyse) throws SQLException {
+    public static ArrayList[] getData(String id_analyse, boolean ShowOrphin) throws SQLException {
         ArrayList[] data = new ArrayList[2];
         data[0] = new ArrayList<String[]>();
         data[1] = new ArrayList<String[]>();
 
-        ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse='" + id_analyse + "'");
         ArrayList<String> nodes = new ArrayList<>();
-
-        while (host.next()) {
-            if (!nodes.contains(host.getString("ip"))) {
-                nodes.add(host.getString("ip"));
-                String[] tmp = new String[]{"" + nodes.size(), host.getString("ip"), host.getString("hostname"), host.getString("tcp"), host.getString("udp"), host.getString("at")};
-                data[0].add(nodes.size() - 1, tmp);
-            }
-        }
 
         ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
         ArrayList<String> trajets = new ArrayList<>();
@@ -181,8 +173,8 @@ public class Tool {
             int source = 0, target = 0;
 
             if (!nodes.contains(route.getString("from"))) {
-                nodes.add(host.getString("from"));
-                String[] tmp = new String[]{"" + nodes.size(), host.getString("from"), host.getString("from"), "", "", ""};
+                nodes.add(route.getString("from"));
+                String[] tmp = new String[]{"" + nodes.size(), route.getString("from"), route.getString("from"), "", "", ""};
                 data[0].add(nodes.size() - 1, tmp);
                 source = nodes.size() - 1;
             } else {
@@ -190,8 +182,8 @@ public class Tool {
             }
 
             if (!nodes.contains(route.getString("to"))) {
-                nodes.add(host.getString("to"));
-                String[] tmp = new String[]{"" + nodes.size(), host.getString("to"), host.getString("to"), "", "", ""};
+                nodes.add(route.getString("to"));
+                String[] tmp = new String[]{"" + nodes.size(), route.getString("to"), route.getString("to"), "", "", ""};
                 data[0].add(nodes.size() - 1, tmp);
                 target = nodes.size() - 1;
             } else {
@@ -211,6 +203,50 @@ public class Tool {
 
         }
 
+        ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse='" + id_analyse + "'");
+        int rownb = 0;
+        while (host.next()) {
+            rownb++;
+            if (nodes.contains(host.getString("ip"))) {
+                //nodes.set(nodes.indexOf(host.getString("ip")), host.getString("ip"));
+                String[] tmp = new String[]{"" + nodes.indexOf(host.getString("ip")), host.getString("ip"), host.getString("hostname"), host.getString("tcp"), host.getString("udp"), host.getString("at")};
+                //data[0].add(nodes.indexOf(host.getString("ip")), tmp);
+                data[0].set(nodes.indexOf(host.getString("ip")), tmp);
+                System.out.println("Node : " + host.getString("ip") + " is show and not orphin");
+            } else if (ShowOrphin) {
+                nodes.add(host.getString("ip"));
+                String[] tmp = new String[]{"" + nodes.size(), host.getString("ip"), host.getString("hostname"), host.getString("tcp"), host.getString("udp"), host.getString("at")};
+                data[0].add(nodes.size() - 1, tmp);
+                System.out.println("Node : " + host.getString("ip") + " is show and orphin");
+            } else{
+                System.out.println("Node : " + host.getString("ip") + " is not show");
+            }
+        }
+
+        System.out.println("Nodes Total: " + rownb);
+        System.out.println("Nodes Affichés: " + nodes.size());
+
+        /*
+         if (!ShowOrphin) {
+         System.out.println("Cleaning ...");
+
+         for (Iterator<String> it = nodes.iterator(); it.hasNext();) {
+         String ip = it.next();
+         boolean is_linked = false;
+         /* for (Iterator<String> it1 = trajets.iterator(); it1.hasNext();) {
+         String trajet = it1.next();
+         if (trajet.contains(ip)) {
+         is_linked = true;
+         break;
+         }
+         }
+                 
+         if (!is_linked) {
+         System.out.println("Removing : " + ip + " @ " + nodes.indexOf(ip));
+         nodes.remove(nodes.indexOf(ip));
+         }
+         }
+         */
         //data[0].add(host)
         return data;
     }

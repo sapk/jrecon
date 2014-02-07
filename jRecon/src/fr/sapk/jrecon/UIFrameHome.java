@@ -83,6 +83,7 @@ public class UIFrameHome extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         InfoScanPanel = new javax.swing.JTextPane();
         ComboBoxResult = new javax.swing.JComboBox();
+        ShowOrphin = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         ButtonResetDB = new javax.swing.JButton();
         ButtonImport = new javax.swing.JButton();
@@ -279,6 +280,13 @@ public class UIFrameHome extends javax.swing.JFrame {
             }
         });
 
+        ShowOrphin.setText("Afficher orphelins");
+        ShowOrphin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ShowOrphinActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout PanelResultsLayout = new javax.swing.GroupLayout(PanelResults);
         PanelResults.setLayout(PanelResultsLayout);
         PanelResultsLayout.setHorizontalGroup(
@@ -288,12 +296,13 @@ public class UIFrameHome extends javax.swing.JFrame {
                 .addGroup(PanelResultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(ComboBoxResult, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(PanelResultsLayout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(PanelResultsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(ButtonSupprimer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(ButtonShowGraph, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE)
-                            .addComponent(ButtonExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(ButtonExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(ShowOrphin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         PanelResultsLayout.setVerticalGroup(
@@ -310,7 +319,8 @@ public class UIFrameHome extends javax.swing.JFrame {
                         .addComponent(ButtonExport, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(12, 12, 12)
                         .addComponent(ButtonSupprimer, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 19, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                        .addComponent(ShowOrphin))
                     .addComponent(jScrollPane1))
                 .addContainerGap())
         );
@@ -437,7 +447,7 @@ public class UIFrameHome extends javax.swing.JFrame {
             buildXMLMap(selected.split("\\)")[0]);
             try {
                 // TODO add your handling code here:
-                new Thread(new UIFrameMap("data/map.xml")).start();
+                new Thread(new UIFrameMap(JRecon.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/../data/map.xml")).start();
             } catch (Throwable ex) {
                 Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -599,6 +609,10 @@ public class UIFrameHome extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ButtonImportActionPerformed
 
+    private void ShowOrphinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShowOrphinActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ShowOrphinActionPerformed
+
     private void Estimate() {
         //TODO check validity
         /*
@@ -730,6 +744,7 @@ public class UIFrameHome extends javax.swing.JFrame {
     private javax.swing.JTextField InputPort;
     private javax.swing.JTextField InputTarget;
     private javax.swing.JPanel PanelResults;
+    private javax.swing.JCheckBox ShowOrphin;
     private javax.swing.JTextArea TextAreaEstimation;
     public javax.swing.JProgressBar bProgressBar;
     private javax.swing.JLabel jLabel1;
@@ -750,7 +765,7 @@ public class UIFrameHome extends javax.swing.JFrame {
     }
 
     void buildXMLMap(String id_analyse) throws IOException, SQLException {
-        ArrayList[] data = Tool.getData(id_analyse);
+        ArrayList[] data = Tool.getData(id_analyse, ShowOrphin.isSelected() );
         String xml = Tool.buildXML(data[0], data[1]);
         Tool.writetoFile(JRecon.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/../data/map.xml", xml);
         //System.out.println(((String[]) a[1].get(0))[1]);
