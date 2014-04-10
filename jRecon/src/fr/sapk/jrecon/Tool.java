@@ -38,7 +38,17 @@ public class Tool {
         //TODO support ipv6
         return s.matches("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
     }
+    public static String get_root_folder() {
+        String folder = JRecon.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
+        System.out.println("Debug : "+folder);
+        if (folder.matches(".*jRecon.jar$")) {
+            folder = folder.substring(0, folder.length() - 10);
+        } else if (folder.matches(".*/classes/$")) {
+            folder = folder.substring(0, folder.length() - 8);
+        }
+        return folder;
+    }
     public static boolean is_network(String s) {
         //TODO support ipv6
         if (s.contains("/") && s.split("/").length == 2) {

@@ -447,7 +447,7 @@ public class UIFrameHome extends javax.swing.JFrame {
             buildXMLMap(selected.split("\\)")[0]);
             try {
                 // TODO add your handling code here:
-                new Thread(new UIFrameMap(JRecon.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/../data/map.xml")).start();
+                new Thread(new UIFrameMap(Tool.get_root_folder()+"data/map.xml")).start();
             } catch (Throwable ex) {
                 Logger.getLogger(UIFrameHome.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -768,99 +768,8 @@ public class UIFrameHome extends javax.swing.JFrame {
     void buildXMLMap(String id_analyse) throws IOException, SQLException {
         ArrayList[] data = Tool.getData(id_analyse, ShowOrphin.isSelected() );
         String xml = Tool.buildXML(data[0], data[1]);
-        Tool.writetoFile(JRecon.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/../data/map.xml", xml);
-        //System.out.println(((String[]) a[1].get(0))[1]);
-        /*
-        File file = new File("data/map.xml");
-        if (file.exists()) {
-            file.delete();
-        }
-        file.createNewFile();
+        Tool.writetoFile(Tool.get_root_folder()+"data/map.xml", xml);
 
-        FileWriter writer = new FileWriter(file);
-
-        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                + "<!--  Data for visualitation of a network  -->\n"
-                + "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\">\n"
-                + "<graph edgedefault=\"undirected\">\n"
-                + " \n"
-                + "<!-- data schema -->\n"
-                + "<key id=\"ip\" for=\"node\" attr.name=\"ip\" attr.type=\"string\"/>\n"
-                + "<key id=\"hostname\" for=\"node\" attr.name=\"hostname\" attr.type=\"string\"/>\n"
-                //     + "<key id=\"at\" for=\"node\" attr.name=\"at\" attr.type=\"DateTime\"/>\n"
-                + ""
-                + "<key id=\"size\" for=\"edge\" attr.name=\"size\" attr.type=\"Double\"/>\n"
-                + "\n\n");
-        ResultSet host = DB.query("SELECT * FROM host WHERE id_analyse='" + id_analyse + "'");
-        List<String> nodes = new ArrayList<>();
-        while (host.next()) {
-            //TODO optimize to add info if note existing
-            if (!nodes.contains(host.getString("ip"))) {
-                nodes.add(host.getString("ip"));
-                writer.write("<node id=\"" + nodes.size() + "\">\n"
-                        + " <data key=\"ip\">" + host.getString("ip") + "</data>\n"
-                        + " <data key=\"hostname\">" + host.getString("hostname") + "</data>\n"
-                        //           + " <data key=\"tcp\">" + host.getString("tcp") + "</data>\n"
-                        //           + " <data key=\"udp\">" + host.getString("udp") + "</data>\n"
-                        //           + " <data key=\"at\">" + host.getString("at") + "</data>\n"
-                        + " </node>\n");
-            }
-        }
-        ResultSet route = DB.query("SELECT * FROM route WHERE id_analyse='" + id_analyse + "'");
-        //List<String> nodes = new ArrayList<>();
-        List<String> trajets = new ArrayList<>();
-        while (route.next()) {
-            int source = 0;
-            int target = 0;
-            if (!nodes.contains(route.getString("from"))) {
-                nodes.add(route.getString("from"));
-                writer.write("<node id=\"" + nodes.size() + "\">\n"
-                        + " <data key=\"ip\">" + route.getString("from") + "</data>\n"
-                        //        + " <data key=\"at\">" + route.getString("at") + "</data>\n"
-                        + " <data key=\"hostname\">" + route.getString("from") + "</data>\n"
-                        + " </node>\n");
-                source = nodes.size();
-            } else {
-                source = nodes.indexOf(route.getString("from")) + 1;
-            }
-
-            if (!nodes.contains(route.getString("to"))) {
-                nodes.add(route.getString("to"));
-                writer.write("<node id=\"" + nodes.size() + "\">\n"
-                        + " <data key=\"ip\">" + route.getString("to") + "</data>\n"
-                        //           + " <data key=\"at\">" + route.getString("at") + "</data>\n"
-                        + " <data key=\"hostname\">" + route.getString("to") + "</data>\n"
-                        + " </node>\n");
-                target = nodes.size();
-            } else {
-                target = nodes.indexOf(route.getString("to")) + 1;
-            }
-
-            if (!trajets.contains(source + "->" + target)) {
-                trajets.add(source + "->" + target);
-                //TODO determine size
-                int count = 1;
-//                System.out.println("SELECT COUNT(*) FROM route WHERE from=" + source + " AND to=" + target + "");
-            //    System.out.println("SELECT COUNT(*) FROM route");
-            //    ResultSet c = DB.query("SELECT COUNT(*) FROM route");
-            //    c.next();
-            //    count = c.getInt(1);
-
-                System.out.println("count : " + count);
-                // Array f = route.getArray("from");
-                // Array t = route.getArray("to");
-                writer.write("\n<edge source=\"" + source + "\" target=\"" + target + "\">"
-                        //  + " <data key=\"size\">" + DB.count("SELECT * FROM route WHERE `from`='" + source + "' AND `to`='" + target + "';") + "</data>\n"
-                        + " <data key=\"size\">" + 5 + "</data>\n"
-                        + "</edge>\n");
-            }
-        }
-
-        writer.write("\n\n"
-                + "</graph>\n"
-                + "</graphml>");
-        writer.flush();
-        */
     }
 
     void setAll(boolean state) {

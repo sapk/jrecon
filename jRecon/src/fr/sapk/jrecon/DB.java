@@ -17,8 +17,6 @@
 package fr.sapk.jrecon;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -40,15 +38,17 @@ public class DB {
         check();
     }
 
-    private static String DBPath = JRecon.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/../data/db.sqlite";
+    //private static String DBPath = JRecon.class.getProtectionDomain().getCodeSource().getLocation().getPath()+"/../data/db.sqlite";
+    private static String DBPath = "data/db.sqlite";
     //private static String DBPath = ":memory:";
 
     private static Connection connection = null;
     private static Statement statement = null;
 
     public DB() {
+        DBPath = Tool.get_root_folder()+DBPath;
         File p = new File(DBPath).getParentFile();
-        if (! p.isDirectory() ){
+        if (!p.isDirectory()) {
             p.mkdir();
         }
         if (connection == null || statement == null) {
@@ -84,11 +84,11 @@ public class DB {
     }
 
     static synchronized void execQueue() throws SQLException {
-        System.out.println(System.currentTimeMillis()+" SQL Batch executing ...");
+        System.out.println(System.currentTimeMillis() + " SQL Batch executing ...");
         statement.executeBatch();
-        System.out.println(System.currentTimeMillis()+" SQL Batch executed ...");
+        System.out.println(System.currentTimeMillis() + " SQL Batch executed ...");
         connection.commit();
-        System.out.println(System.currentTimeMillis()+" SQL Batch commited ...");
+        System.out.println(System.currentTimeMillis() + " SQL Batch commited ...");
     }
 
     private static void connect() {
